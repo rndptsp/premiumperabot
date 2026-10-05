@@ -4,6 +4,9 @@ const CONFIG = {
   tiktok: "https://www.tiktok.com/@premiumperabot",
   instagram: "",                          // e.g. "https://www.instagram.com/username" (hidden if empty)
   mapsQuery: "Warehouse Premium Perabot, Tanjung Pauh, Payakumbuh Barat, Payakumbuh City, West Sumatra 26223",
+  // Public API of the admin app (Google Apps Script "Link Publik"): catalog, order form, tracking.
+  api: "https://script.google.com/macros/s/AKfycbx0-lUR6IlsUceei2AJ3VSQBe9AJB9YeZEBc6Yj21uCx-bbaENkhDeVN2IjKUdyTBfJIA/exec",
+  staffUrl: "https://script.google.com/macros/s/AKfycbzfRxn1oA_KiOhkyW-vjlqH3GqVdIO8FBuOqQXww-zV_z3Ng3bkYJAHxb_n53SPWHNmsQ/exec",
 };
 
 const CATEGORY_LABELS = {
@@ -155,6 +158,7 @@ function openPlayer(id) {
   $("#player-price").outerHTML = p.priceLabel ? priceHtml(p.priceLabel).replace('<p class="price">', '<p class="price" id="player-price">') : '<p class="price" id="player-price"></p>';
   $("#player-wa").href = waLink(`Halo Premium Perabot, saya tertarik dengan "${p.title}". Apakah masih tersedia? ${p.url}`);
   $("#player-link").href = p.url;
+  $("#player-order").onclick = () => { closePlayer(); addToOrder(p.title); };
   dlg.showModal();
 }
 function closePlayer() {
@@ -165,8 +169,10 @@ $("#player-close").addEventListener("click", closePlayer);
 dlg.addEventListener("click", (e) => { if (e.target === dlg) closePlayer(); });
 
 document.addEventListener("click", (e) => {
+  const add = e.target.closest("[data-pesan]");
+  if (add) { e.stopPropagation(); addToOrder(add.dataset.pesan); return; }
   const c = e.target.closest(".card");
-  if (c) openPlayer(c.dataset.id);
+  if (c && c.dataset.id) openPlayer(c.dataset.id);
 });
 document.addEventListener("keydown", (e) => {
   const c = e.target.closest?.(".card");
@@ -175,3 +181,136 @@ document.addEventListener("keydown", (e) => {
 
 renderChips();
 renderGrid();
+
+// =========================================================
+// Connection to the admin app (public API)
+// =========================================================
+document.querySelectorAll(".js-staff").forEach((a) => (a.href = CONFIG.staffUrl));
+
+async function callApi(params, body) {
+  const url = CONFIG.api + "?" + new URLSearchParams(params);
+  const res = await fetch(url, body
+    ? { method: "POST", body: JSON.stringify(body), headers: { "Content-Type": "text/plain;charset=utf-8" } }
+    : {});
+  const data = await res.json();
+  if (!data.ok) throw new Error(data.error || "Terjadi kesalahan");
+  return data.data;
+}
+
+const fmtRp = (n) => "Rp " + Math.round(n).toLocaleString("id-ID");
+const fdateId = (s) => {
+  if (!s) return "-";
+  const [y, m, d] = String(s).slice(0, 10).split("-");
+  return `${+d} ${["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agu", "Sep", "Okt", "Nov", "Des"][+m - 1]} ${y}`;
+};
+const tiktokId = (u) => (String(u || "").match(/video\/(\d+)/) || [])[1] || "";
+
+// ---- Products & prices from the admin app ----
+async function loadApiCatalog() {
+  try {
+    const { products } = await callApi({ api: "catalog" });
+    if (!products.length) return;
+    $("#api-grid").innerHTML = products.map((p) => {
+      const vid = tiktokId(p.tiktok);
+      const local = vid && byId.get(vid);
+      const img = p.foto || (local ? local.img : "") || "img/logo-mark.svg";
+      return `<article class="card" ${local ? `data-id="${vid}" tabindex="0" role="button"` : ""}>
+        <div class="card-img"><img src="${esc(img)}" alt="${esc(p.nama)}" loading="lazy" ${img.endsWith(".svg") ? 'style="object-fit:contain;padding:28%"' : ""}>
+          ${local ? '<span class="play" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></span>' : ""}</div>
+        <div class="card-body">
+          <h3>${esc(p.nama)}</h3>
+          <p class="card-cat">${esc(p.kategori)}${p.deskripsi ? " · " + esc(p.deskripsi) : ""}</p>
+          ${p.harga ? `<p class="price"><sup>Rp</sup><b>${Math.round(p.harga).toLocaleString("id-ID")}</b></p>` : '<p class="card-cat">Harga: tanya via WhatsApp</p>'}
+          <button class="btn btn-outline btn-sm" style="margin-top:10px" data-pesan="${esc(p.nama)}">+ Pesan</button>
+        </div>
+      </article>`;
+    }).join("");
+    $("#produk").hidden = false;
+  } catch (e) {
+    console.warn("Katalog admin tidak tersedia:", e.message);
+  }
+}
+
+function addToOrder(name) {
+  const ta = $("#order-produk");
+  const lines = ta.value.split("\n").map((l) => l.trim()).filter(Boolean);
+  if (!lines.some((l) => l.toLowerCase().startsWith(name.toLowerCase()))) lines.push(`${name} x1`);
+  ta.value = lines.join("\n");
+  document.getElementById("pesan").scrollIntoView({ behavior: "smooth" });
+  ta.classList.add("flash");
+  setTimeout(() => ta.classList.remove("flash"), 1200);
+}
+
+// ---- Order form → admin app inbox ----
+$("#order-form").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const f = Object.fromEntries(new FormData(e.target));
+  const msg = $("#order-msg");
+  msg.className = "form-msg";
+  if (!f.nama.trim() || f.hp.replace(/\D/g, "").length < 10 || !f.produk.trim()) {
+    msg.textContent = "Isi nama, nomor HP/WA yang benar, dan produk yang diinginkan.";
+    msg.classList.add("err");
+    return;
+  }
+  const btn = $("#order-submit");
+  btn.disabled = true;
+  btn.textContent = "Mengirim…";
+  try {
+    await callApi({ api: "order" }, f);
+    const wa = waLink(`Halo Premium Perabot, saya ${f.nama} baru saja mengisi formulir pesanan di website:\n${f.produk}`);
+    e.target.innerHTML = `<div class="form-done"><h3>Terima kasih, ${esc(f.nama.split(" ")[0])}! 🙏</h3>
+      <p>Pesanan Anda sudah kami terima. Tim kami akan menghubungi Anda lewat WhatsApp untuk konfirmasi.</p>
+      <a class="btn btn-wa" href="${wa}" target="_blank" rel="noopener">Chat sekarang di WhatsApp</a></div>`;
+  } catch (err) {
+    msg.textContent = err.message + " Anda juga bisa langsung chat WhatsApp.";
+    msg.classList.add("err");
+    btn.disabled = false;
+    btn.textContent = "Kirim pesanan";
+  }
+});
+
+// ---- Order tracking ----
+const STAGES = ["Antri", "Diproduksi", "Siap Kirim", "Terkirim"];
+$("#track-form").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const f = Object.fromEntries(new FormData(e.target));
+  const msg = $("#track-msg"), out = $("#track-result"), btn = $("#track-submit");
+  msg.className = "form-msg";
+  msg.textContent = "";
+  out.hidden = true;
+  btn.disabled = true;
+  btn.textContent = "Mencari…";
+  try {
+    const o = await callApi({ api: "track", nota: f.nota.trim(), hp: f.hp });
+    const cur = Math.max(0, STAGES.indexOf(o.status));
+    out.innerHTML = `
+      <div class="track-head"><div><span class="muted">Nota #${esc(o.nota)}</span><h3>Halo, ${esc(o.nama)}</h3></div>
+        <span class="track-status">${o.status === "Batal" ? "Dibatalkan" : esc(o.status)}</span></div>
+      ${o.status === "Batal" ? "" : `<ol class="track-steps">${STAGES.map((s, i) => `<li class="${i < cur ? "done" : i === cur ? "current" : ""}"><i></i><span>${s}</span></li>`).join("")}</ol>`}
+      <dl class="track-info">
+        <div><dt>Tanggal pesan</dt><dd>${fdateId(o.tanggalOrder)}</dd></div>
+        <div><dt>Jadwal kirim</dt><dd>${fdateId(o.tanggalKirim)}</dd></div>
+        <div><dt>Total</dt><dd>${fmtRp(o.total)}</dd></div>
+        <div><dt>Sudah dibayar</dt><dd>${fmtRp(o.terbayar)}</dd></div>
+        <div class="${o.sisa > 0 ? "owe" : "paid"}"><dt>Sisa pembayaran</dt><dd>${o.sisa > 0 ? fmtRp(o.sisa) : "LUNAS ✓"}</dd></div>
+      </dl>
+      ${o.items.length ? `<p class="track-items">${o.items.map((i) => `${esc(i.produk)}${i.qty > 1 ? ` ×${i.qty}` : ""}`).join(" · ")}</p>` : ""}
+      <a class="btn btn-wa btn-sm" target="_blank" rel="noopener" href="${waLink(`Halo Premium Perabot, saya ingin menanyakan pesanan nota #${o.nota}.`)}">Tanya soal pesanan ini</a>`;
+    out.hidden = false;
+  } catch (err) {
+    msg.textContent = err.message;
+    msg.classList.add("err");
+  } finally {
+    btn.disabled = false;
+    btn.textContent = "Lacak";
+  }
+});
+
+// Links from the WhatsApp nota: ?nota=xxxx#lacak
+const notaParam = new URLSearchParams(location.search).get("nota");
+if (notaParam) {
+  $("#track-form [name=nota]").value = notaParam;
+  setTimeout(() => { document.getElementById("lacak").scrollIntoView(); $("#track-form [name=hp]").focus(); }, 300);
+}
+
+loadApiCatalog();
