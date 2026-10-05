@@ -3,7 +3,7 @@ const CONFIG = {
   whatsapp: "6285365855226",              // 0853-6585-5226 in international format
   tiktok: "https://www.tiktok.com/@premiumperabot",
   instagram: "",                          // e.g. "https://www.instagram.com/username" (hidden if empty)
-  mapsQuery: "Tanjung Pauh, Payakumbuh, Sumatera Barat", // replace with the exact Google Maps place name if listed
+  mapsQuery: "Warehouse Premium Perabot, Tanjung Pauh, Payakumbuh Barat, Payakumbuh City, West Sumatra 26223",
 };
 
 const CATEGORY_LABELS = {
