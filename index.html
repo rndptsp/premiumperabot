@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Premium Perabot — Furnitur Mewah Harga Gudang, Payakumbuh</title>
+  <meta name="description" content="Warehouse Premium Perabot, Tanjung Pauh, Payakumbuh. Kamar set, sofa, meja makan dan lemari model terbaru dengan harga gudang. Konsultasi gratis, bisa custom, diantar ke rumah.">
+  <meta property="og:title" content="Premium Perabot — Furnitur Mewah Harga Gudang">
+  <meta property="og:description" content="Kamar set, sofa, meja makan & lemari langsung dari gudang di Payakumbuh.">
+  <meta property="og:image" content="video/hero-poster.jpg">
+  <meta name="theme-color" content="#2c2c2c">
+  <link rel="icon" href="img/logo-mark.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800&family=Noto+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="wrap topbar-inner">
+      <a href="#" class="brand" aria-label="Premium Perabot"><img class="logo-mark" src="img/logo-mark.svg" alt="" width="46" height="32"><span class="logo-text"><b>PREMIUM</b><i>PERABOT</i></span></a>
+      <nav class="nav">
+        <a href="#katalog">Katalog</a>
+        <a href="#keunggulan">Keunggulan</a>
+        <a href="#pengantaran">Pengantaran</a>
+        <a href="#lokasi">Lokasi</a>
+      </nav>
+      <a class="btn btn-wa btn-sm js-wa" href="#" target="_blank" rel="noopener">WhatsApp</a>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="wrap hero-inner">
+        <div class="hero-media">
+          <video src="video/hero.mp4" poster="video/hero-poster.jpg" autoplay muted loop playsinline></video>
+        </div>
+        <div class="hero-text">
+          <p class="eyebrow">Warehouse Tanjung Pauh, Payakumbuh</p>
+          <h1>Furnitur mewah, <span>harga gudang</span></h1>
+          <p class="lead">Kamar set, sofa, meja makan dan lemari model terbaru, langsung dari gudang kami. Konsultasi gratis, bisa custom, diantar ke rumah.</p>
+          <div class="hero-cta">
+            <a href="#katalog" class="btn btn-gold">Lihat katalog</a>
+            <a href="#" class="btn btn-outline-light js-wa" target="_blank" rel="noopener">Chat WhatsApp</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="usp">
+      <div class="wrap usp-inner">
+        <div><strong id="stat-products">300+</strong><span>model tersedia</span></div>
+        <div><strong id="stat-views">5 juta+</strong><span>penonton di TikTok</span></div>
+        <div><strong>Mulai Rp 1 jutaan</strong><span>harga terjangkau</span></div>
+        <div><strong>Antar ke rumah</strong><span>Payakumbuh & sekitarnya</span></div>
+      </div>
+    </section>
+
+    <section id="katalog" class="section">
+      <div class="wrap">
+        <div class="section-head">
+          <h2>Belanja berdasarkan kategori</h2>
+        </div>
+        <div class="cat-tiles" id="cat-tiles"></div>
+        <div class="section-head section-head-row">
+          <h2 id="catalog-title">Semua produk</h2>
+          <p>Ketuk produk untuk menonton videonya.</p>
+        </div>
+
+        <div class="filters">
+                    <div class="filter-row">
+            <label class="search">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+              <input id="q" type="search" placeholder="Cari: minimalis, ukiran, jaguar…">
+            </label>
+            <select id="price" aria-label="Rentang harga">
+              <option value="all">Semua harga</option>
+              <option value="0-5">Di bawah 5 juta</option>
+              <option value="5-8">5 – 8 juta</option>
+              <option value="8-12">8 – 12 juta</option>
+              <option value="12-999">12 juta ke atas</option>
+            </select>
+            <select id="sort" aria-label="Urutkan">
+              <option value="new">Terbaru</option>
+              <option value="popular">Terpopuler</option>
+              <option value="cheap">Harga terendah</option>
+              <option value="expensive">Harga tertinggi</option>
+            </select>
+          </div>
+          <p class="result-count" id="count" aria-live="polite"></p>
+        </div>
+
+        <div class="grid" id="grid"></div>
+        <div class="more"><button class="btn btn-outline" id="more">Tampilkan lebih banyak</button></div>
+        <p class="note">Harga dapat berubah sewaktu-waktu. Hubungi kami untuk harga terbaru, promo, dan ketersediaan stok.</p>
+      </div>
+    </section>
+
+    <section id="keunggulan" class="section section-alt">
+      <div class="wrap">
+        <div class="section-head">
+          <h2>Kenapa belanja di Premium Perabot?</h2>
+        </div>
+        <div class="features">
+          <article>
+            <div class="icon"><svg viewBox="0 0 24 24"><path d="M3 21V9l9-6 9 6v12"/><path d="M9 21v-7h6v7"/></svg></div>
+            <h3>Harga gudang</h3>
+            <p>Beli langsung dari warehouse kami, tanpa perantara. Promo dan diskon terbatas rutin tersedia.</p>
+          </article>
+          <article>
+            <div class="icon"><svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></div>
+            <h3>Bisa custom & request</h3>
+            <p>Pilih warna, ukuran, dan model lemari, dipan, atau meja hias sesuai keinginan Anda.</p>
+          </article>
+          <article>
+            <div class="icon"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
+            <h3>Konsultasi gratis</h3>
+            <p>Bingung pilih model? Konsultasikan dulu lewat WhatsApp agar puas dengan kamar set yang dibeli.</p>
+          </article>
+          <article>
+            <div class="icon"><svg viewBox="0 0 24 24"><path d="M1 3h15v13H1z"/><path d="M16 8h4l3 3v5h-7z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg></div>
+            <h3>Diantar ke rumah</h3>
+            <p>Kami mengantar pesanan ke rumah pelanggan, termasuk ke luar Payakumbuh seperti Solok.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="pengantaran" class="section">
+      <div class="wrap">
+        <div class="section-head">
+          <h2>Pengantaran ke pelanggan</h2>
+          <p>Bukti nyata dari lapangan: barang sampai dengan aman di rumah pelanggan.</p>
+        </div>
+        <div class="grid grid-small" id="deliveries"></div>
+      </div>
+    </section>
+
+    <section class="section section-alt">
+      <div class="wrap">
+        <div class="section-head"><h2>Cara pesan</h2></div>
+        <ol class="steps">
+          <li><span>1</span><h3>Pilih model</h3><p>Lihat katalog atau video TikTok kami, simpan model yang Anda suka.</p></li>
+          <li><span>2</span><h3>Chat WhatsApp</h3><p>Kirim nama model, tanyakan harga terbaru, promo, dan opsi custom.</p></li>
+          <li><span>3</span><h3>Datang atau diantar</h3><p>Lihat langsung di gudang Tanjung Pauh, atau kami antar ke rumah Anda.</p></li>
+        </ol>
+      </div>
+    </section>
+
+    <section id="lokasi" class="section">
+      <div class="wrap location">
+        <div>
+          <h2>Kunjungi gudang kami</h2>
+          <p class="address">Warehouse Premium Perabot<br>Tanjung Pauh, Payakumbuh<br>Sumatera Barat</p>
+          <ul class="contact">
+            <li><strong>WhatsApp</strong> <a class="js-wa js-wa-text" href="#" target="_blank" rel="noopener"></a></li>
+            <li><strong>TikTok</strong> <a class="js-tiktok" href="#" target="_blank" rel="noopener">@premiumperabot</a></li>
+            <li class="js-ig-row" hidden><strong>Instagram</strong> <a class="js-ig" href="#" target="_blank" rel="noopener"></a></li>
+          </ul>
+          <div class="hero-cta">
+            <a href="#" class="btn btn-wa js-wa" target="_blank" rel="noopener">Chat WhatsApp</a>
+            <a href="#" class="btn btn-outline js-maps" target="_blank" rel="noopener">Buka di Google Maps</a>
+          </div>
+        </div>
+        <div class="map">
+          <iframe class="js-map-embed" title="Peta lokasi Premium Perabot" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="wrap">
+      <p class="brand brand-light"><img class="logo-mark" src="img/logo-mark.svg" alt="" width="46" height="32"><span class="logo-text"><b>PREMIUM</b><i>PERABOT</i></span></p>
+      <p>Tanjung Pauh, Payakumbuh · © <span id="year"></span> Warehouse Premium Perabot</p>
+    </div>
+  </footer>
+
+  <a class="wa-float js-wa" href="#" target="_blank" rel="noopener" aria-label="Chat WhatsApp">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2Zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8s-.4-.1-.6.1-.7.8-.8 1-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.2-.4.7-1.4a.5.5 0 0 0 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.7 11.8 11.8 0 0 0 4.5 4c1.7.7 2.3.8 3.2.6a2.7 2.7 0 0 0 1.8-1.2 2.2 2.2 0 0 0 .1-1.3c0-.1-.2-.2-.5-.3Z"/></svg>
+  </a>
+
+  <dialog id="player" class="player">
+    <div class="player-inner">
+      <button class="player-close" id="player-close" aria-label="Tutup">×</button>
+      <div class="player-frame"><iframe id="player-iframe" title="Video TikTok" allow="autoplay; encrypted-media; fullscreen" allowfullscreen></iframe></div>
+      <div class="player-info">
+        <p class="player-cat" id="player-cat"></p>
+        <h3 id="player-title"></h3>
+        <p class="price" id="player-price"></p>
+        <a class="btn btn-wa" id="player-wa" target="_blank" rel="noopener">Tanya via WhatsApp</a>
+        <a class="player-link" id="player-link" target="_blank" rel="noopener">Buka di TikTok ↗</a>
+      </div>
+    </div>
+  </dialog>
+
+  <script src="data/products.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
