@@ -43,6 +43,19 @@ def clean_title(desc: str) -> str:
     return text[:90]
 
 
+PRICE_IN_TITLE = re.compile(
+    r"(?:\b(?:harga|mulai|cuma|hanya)\s*)?(?:rp\.?\s*)?"
+    r"(?:\d{1,3}(?:\.\d{3}){1,2}|\d+\s*-\s*\d+\s*(?:jt|jut)\w*|\d+(?:[.,]\d+)?\s*(?:jt|jut)\w*|\d+,\d{1,2}\b)(?:-?an\b)?",
+    re.I)
+
+
+def strip_price(title: str) -> str:
+    """Remove prices from a caption title: the website shows 'Call / WhatsApp' instead of TikTok prices."""
+    text = PRICE_IN_TITLE.sub("", title)
+    text = re.sub(r"\s+([,.])", r"\1", re.sub(r"\s+", " ", text))
+    return text.strip(" -,.:")
+
+
 def parse_price(text: str):
     """Return (value_in_juta, label) or (None, None)."""
     m = re.search(r"(\d{1,3}(?:\.\d{3}){2})", text)  # 5.950.000
@@ -87,7 +100,7 @@ def main():
             continue
         vid = str(data["id"])
         desc = (data.get("description") or "").strip()
-        title = clean_title(desc)
+        title = strip_price(clean_title(desc))
         if not title:
             continue
 
@@ -112,10 +125,10 @@ def main():
             "img": f"img/{vid}.jpg",
             "url": data.get("webpage_url") or f"https://www.tiktok.com/@premiumperabot/video/{vid}",
         }
-        price, label = parse_price(desc)
-        if price is not None:
+        price, _ = parse_price(desc)
+        if price is not None:  # a price in the caption marks a product post; the price itself is not published
             cat = category_of(title)
-            item.update(price=price, priceLabel=label, cat=cat if cat != "lainnya" else category_of(desc))
+            item.update(cat=cat if cat != "lainnya" else category_of(desc))
             products.append(item)
         elif re.search(DELIVERY, desc, re.I):
             deliveries.append(item)

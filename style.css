@@ -309,3 +309,5 @@ a.cat-tile { text-decoration: none; color: inherit; }
 @media (prefers-reduced-motion: reduce) {
   * { transition: none !important; scroll-behavior: auto !important; }
 }
+.price-ask b { font-size: 18px; color: var(--maroon, #6c0d27); }
+.player-info .price-ask b { font-size: 22px; }

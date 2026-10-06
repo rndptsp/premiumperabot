@@ -22,7 +22,7 @@ const PAGE = 24;
 
 const products = window.PRODUCTS || [];
 const params = new URLSearchParams(location.search);
-const state = { cat: params.get("cat") || "all", q: "", price: "all", sort: params.get("sort") || "new", shown: PAGE };
+const state = { cat: params.get("cat") || "all", q: "", sort: params.get("sort") === "popular" ? "popular" : "new", shown: PAGE };
 const PAGE_ID = document.body.dataset.page || "index";
 
 // Old WhatsApp nota links pointed to index.html?nota=…#lacak — send them to the tracking page.
@@ -85,17 +85,13 @@ function renderChips() {
 
 function filtered() {
   const q = state.q.trim().toLowerCase();
-  const [lo, hi] = state.price === "all" ? [0, Infinity] : state.price.split("-").map(Number);
   const list = products.filter((p) =>
     (state.cat === "all" || p.cat === state.cat) &&
-    (!q || p.title.toLowerCase().includes(q)) &&
-    p.price >= lo && p.price < hi
+    (!q || p.title.toLowerCase().includes(q))
   );
   const sorters = {
     new: (a, b) => b.date.localeCompare(a.date),
     popular: (a, b) => b.views - a.views,
-    cheap: (a, b) => a.price - b.price,
-    expensive: (a, b) => b.price - a.price,
   };
   return list.sort(sorters[state.sort]);
 }
@@ -104,13 +100,8 @@ const recentCutoff = [...products].sort((a, b) => b.date.localeCompare(a.date))[
 const popularCutoff = [...products].sort((a, b) => b.views - a.views)[Math.min(19, products.length - 1)]?.views || Infinity;
 const esc = (t) => t.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/"/g, "&quot;");
 
-function priceHtml(label) {
-  if (!label) return "";
-  const rest = label.replace(/^Rp\s*/, "");
-  const m = rest.match(/^([\d.,–-]+)\s*(.*)$/);
-  if (!m) return `<p class="price">${esc(label)}</p>`;
-  return `<p class="price"><sup>Rp</sup><b>${m[1]}</b>${m[2] ? `<small>${esc(m[2].toLowerCase())}</small>` : ""}</p>`;
-}
+// TikTok captions carry old prices, so the video catalog never shows them; current prices come from the admin app.
+const ASK_PRICE = '<p class="price price-ask"><sup>Rp</sup><b>Call / WhatsApp</b></p>';
 
 function card(p, { showPrice = true } = {}) {
   const badge = p.date >= recentCutoff ? `<span class="badge badge-new">Baru</span>`
@@ -125,7 +116,7 @@ function card(p, { showPrice = true } = {}) {
         ${badge}
         <h3>${esc(p.title)}</h3>
         <p class="card-cat">${p.cat ? CATEGORY_LABELS[p.cat] : "Pengantaran"} · ${fmtViews(p.views)} views</p>
-        ${showPrice ? priceHtml(p.priceLabel) : ""}
+        ${showPrice ? ASK_PRICE : ""}
       </div>
     </article>`;
 }
@@ -155,7 +146,6 @@ if ($("#grid")) {
     clearTimeout(t);
     t = setTimeout(() => { state.q = e.target.value; state.shown = PAGE; renderGrid(); }, 150);
   });
-  $("#price").addEventListener("change", (e) => { state.price = e.target.value; state.shown = PAGE; renderGrid(); });
   $("#sort").value = state.sort;
   $("#sort").addEventListener("change", (e) => { state.sort = e.target.value; renderGrid(); });
   $("#more").addEventListener("click", () => { state.shown += PAGE; renderGrid(); });
@@ -179,7 +169,7 @@ function openPlayer(id) {
   $("#player-iframe").src = `https://www.tiktok.com/player/v1/${p.id}?autoplay=1&loop=1&rel=0&description=0&music_info=0`;
   $("#player-cat").textContent = p.cat ? CATEGORY_LABELS[p.cat] : "Pengantaran";
   $("#player-title").textContent = p.title;
-  $("#player-price").outerHTML = p.priceLabel ? priceHtml(p.priceLabel).replace('<p class="price">', '<p class="price" id="player-price">') : '<p class="price" id="player-price"></p>';
+  $("#player-price").outerHTML = (p.cat ? ASK_PRICE : '<p class="price"></p>').replace('<p class="price', '<p id="player-price" class="price');
   $("#player-wa").href = waLink(`Halo Premium Perabot, saya tertarik dengan "${p.title}". Apakah masih tersedia? ${p.url}`);
   $("#player-link").href = p.url;
   $("#player-order").onclick = () => { closePlayer(); addToOrder(p.title); };
