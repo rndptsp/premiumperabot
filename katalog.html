@@ -3,9 +3,9 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Premium Perabot — Furnitur Mewah Harga Gudang, Payakumbuh</title>
+  <title>Katalog Produk — Premium Perabot</title>
   <meta name="description" content="Warehouse Premium Perabot, Tanjung Pauh, Payakumbuh. Kamar set, sofa, meja makan dan lemari model terbaru dengan harga gudang. Konsultasi gratis, bisa custom, diantar ke rumah.">
-  <meta property="og:title" content="Premium Perabot — Furnitur Mewah Harga Gudang, Payakumbuh">
+  <meta property="og:title" content="Katalog Produk — Premium Perabot">
   <meta property="og:description" content="Kamar set, sofa, meja makan & lemari langsung dari gudang di Payakumbuh.">
   <meta property="og:image" content="video/hero-poster.jpg">
   <meta name="theme-color" content="#2c2c2c">
@@ -15,13 +15,13 @@
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
-<body data-page="index">
+<body data-page="katalog">
   <header class="topbar">
     <div class="wrap topbar-inner">
       <a href="index.html" class="brand" aria-label="Premium Perabot — Beranda"><img class="logo-mark" src="img/logo-mark.svg" alt="" width="46" height="32"><span class="logo-text"><b>PREMIUM</b><i>PERABOT</i></span></a>
       <nav class="nav" id="site-nav" aria-label="Menu utama">
-        <a href="index.html" aria-current="page">Beranda</a>
-        <a href="katalog.html">Katalog</a>
+        <a href="index.html">Beranda</a>
+        <a href="katalog.html" aria-current="page">Katalog</a>
         <a href="tentang.html">Tentang Kami</a>
         <a href="pesan.html">Pesan <span class="cart-count" id="cart-count" hidden></span></a>
         <a href="lacak.html">Lacak Pesanan</a>
@@ -35,79 +35,57 @@
   </header>
 
   <main>
-    <section class="hero">
-      <div class="wrap hero-inner">
-        <div class="hero-media">
-          <video src="video/hero.mp4" poster="video/hero-poster.jpg" autoplay muted loop playsinline></video>
-        </div>
-        <div class="hero-text">
-          <p class="eyebrow">Warehouse Tanjung Pauh, Payakumbuh</p>
-          <h1>Furnitur mewah, <span>harga gudang</span></h1>
-          <p class="lead">Kamar set, sofa, meja makan dan lemari model terbaru, langsung dari gudang kami. Konsultasi gratis, bisa custom, diantar ke rumah.</p>
-          <div class="hero-cta">
-            <a href="katalog.html" class="btn btn-gold">Lihat katalog</a>
-            <a href="#" class="btn btn-outline-light js-wa" target="_blank" rel="noopener">Chat WhatsApp</a>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section class="usp">
-      <div class="wrap usp-inner">
-        <div><strong id="stat-products">300+</strong><span>model tersedia</span></div>
-        <div><strong id="stat-views">5 juta+</strong><span>penonton di TikTok</span></div>
-        <div><strong>Mulai Rp 1 jutaan</strong><span>harga terjangkau</span></div>
-        <div><strong>Antar ke rumah</strong><span>Payakumbuh & sekitarnya</span></div>
-      </div>
-    </section>
-
-    <section class="section">
+    <section class="page-hero">
       <div class="wrap">
-        <div class="section-head section-head-flex"><h2>Belanja berdasarkan kategori</h2><a class="link-more" href="katalog.html">Lihat semua produk →</a></div>
-        <div class="cat-tiles" id="cat-tiles" data-link="katalog.html"></div>
-      </div>
-    </section>
-    <section class="section section-alt">
-      <div class="wrap">
-        <div class="section-head section-head-flex"><h2>Paling banyak ditonton</h2><a class="link-more" href="katalog.html?sort=popular">Lihat katalog →</a></div>
-        <div class="grid" id="home-grid"></div>
+        <h1>Katalog produk</h1>
+        <p>Kamar set, sofa, meja makan, lemari, dan lainnya. Ketuk produk untuk menonton videonya.</p>
       </div>
     </section>
 
-    <section class="section">
+    <section id="produk" class="section section-tight" hidden>
       <div class="wrap">
         <div class="section-head">
-          <h2>Kenapa belanja di Premium Perabot?</h2>
+          <h2>Produk & harga terbaru</h2>
+          <p>Harga terkini langsung dari gudang kami. Klik <b>Pesan</b> untuk menambahkan ke formulir pemesanan.</p>
         </div>
-        <div class="features">
-          <article>
-            <div class="icon"><svg viewBox="0 0 24 24"><path d="M3 21V9l9-6 9 6v12"/><path d="M9 21v-7h6v7"/></svg></div>
-            <h3>Harga gudang</h3>
-            <p>Beli langsung dari warehouse kami, tanpa perantara. Promo dan diskon terbatas rutin tersedia.</p>
-          </article>
-          <article>
-            <div class="icon"><svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></div>
-            <h3>Bisa custom & request</h3>
-            <p>Pilih warna, ukuran, dan model lemari, dipan, atau meja hias sesuai keinginan Anda.</p>
-          </article>
-          <article>
-            <div class="icon"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
-            <h3>Konsultasi gratis</h3>
-            <p>Bingung pilih model? Konsultasikan dulu lewat WhatsApp agar puas dengan kamar set yang dibeli.</p>
-          </article>
-          <article>
-            <div class="icon"><svg viewBox="0 0 24 24"><path d="M1 3h15v13H1z"/><path d="M16 8h4l3 3v5h-7z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg></div>
-            <h3>Diantar ke rumah</h3>
-            <p>Kami mengantar pesanan ke rumah pelanggan, termasuk ke luar Payakumbuh seperti Solok.</p>
-          </article>
-        </div>
+        <div class="grid" id="api-grid"></div>
       </div>
     </section>
 
-    <section class="cta-band">
-      <div class="wrap cta-inner">
-        <div><h2>Sudah menemukan model yang cocok?</h2><p>Isi formulir pesanan atau chat kami. Konsultasi gratis, bisa custom.</p></div>
-        <div class="hero-cta"><a href="pesan.html" class="btn btn-gold">Pesan sekarang</a><a href="#" class="btn btn-outline-light js-wa" target="_blank" rel="noopener">Chat WhatsApp</a></div>
+    <section id="katalog" class="section">
+      <div class="wrap">
+                <div class="cat-tiles" id="cat-tiles"></div>
+        <div class="section-head section-head-row">
+          <h2 id="catalog-title">Semua produk</h2>
+          <p>Ketuk produk untuk menonton videonya.</p>
+        </div>
+
+        <div class="filters">
+                    <div class="filter-row">
+            <label class="search">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+              <input id="q" type="search" placeholder="Cari: minimalis, ukiran, jaguar…">
+            </label>
+            <select id="price" aria-label="Rentang harga">
+              <option value="all">Semua harga</option>
+              <option value="0-5">Di bawah 5 juta</option>
+              <option value="5-8">5 – 8 juta</option>
+              <option value="8-12">8 – 12 juta</option>
+              <option value="12-999">12 juta ke atas</option>
+            </select>
+            <select id="sort" aria-label="Urutkan">
+              <option value="new">Terbaru</option>
+              <option value="popular">Terpopuler</option>
+              <option value="cheap">Harga terendah</option>
+              <option value="expensive">Harga tertinggi</option>
+            </select>
+          </div>
+          <p class="result-count" id="count" aria-live="polite"></p>
+        </div>
+
+        <div class="grid" id="grid"></div>
+        <div class="more"><button class="btn btn-outline" id="more">Tampilkan lebih banyak</button></div>
+        <p class="note">Harga dapat berubah sewaktu-waktu. Hubungi kami untuk harga terbaru, promo, dan ketersediaan stok.</p>
       </div>
     </section>
   </main>

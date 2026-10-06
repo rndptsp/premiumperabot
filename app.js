@@ -21,7 +21,12 @@ const CATEGORY_LABELS = {
 const PAGE = 24;
 
 const products = window.PRODUCTS || [];
-const state = { cat: "all", q: "", price: "all", sort: "new", shown: PAGE };
+const params = new URLSearchParams(location.search);
+const state = { cat: params.get("cat") || "all", q: "", price: "all", sort: params.get("sort") || "new", shown: PAGE };
+const PAGE_ID = document.body.dataset.page || "index";
+
+// Old WhatsApp nota links pointed to index.html?nota=…#lacak — send them to the tracking page.
+if (PAGE_ID === "index" && params.get("nota")) location.replace("lacak.html?nota=" + encodeURIComponent(params.get("nota")));
 
 const $ = (s, el = document) => el.querySelector(s);
 const waLink = (msg) => `https://wa.me/${CONFIG.whatsapp}?text=${encodeURIComponent(msg)}`;
@@ -39,18 +44,26 @@ if (CONFIG.instagram) {
 }
 const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(CONFIG.mapsQuery)}`;
 document.querySelectorAll(".js-maps").forEach((a) => (a.href = mapsUrl));
-$(".js-map-embed").src = `https://www.google.com/maps?q=${encodeURIComponent(CONFIG.mapsQuery)}&output=embed`;
+if ($(".js-map-embed")) $(".js-map-embed").src = `https://www.google.com/maps?q=${encodeURIComponent(CONFIG.mapsQuery)}&output=embed`;
 $("#year").textContent = new Date().getFullYear();
 
+// ---- Mobile menu ----
+$("#menu-btn").addEventListener("click", () => {
+  const open = document.body.classList.toggle("nav-open");
+  $("#menu-btn").setAttribute("aria-expanded", String(open));
+});
+
 // ---- Stats ----
-if (products.length) $("#stat-products").textContent = `${Math.floor(products.length / 50) * 50}+`;
-if (window.STATS?.views) {
+if (products.length && $("#stat-products")) $("#stat-products").textContent = `${Math.floor(products.length / 50) * 50}+`;
+if (window.STATS?.views && $("#stat-views")) {
   const jt = Math.floor(window.STATS.views / 1e5) / 10;
   $("#stat-views").textContent = `${String(jt).replace(".", ",")} juta+`;
 }
 
 // ---- Catalog ----
 function renderChips() {
+  if (!$("#cat-tiles")) return;
+  const linkOut = $("#cat-tiles").dataset.link;
   const counts = {}, cover = {};
   for (const p of products) {
     counts[p.cat] = (counts[p.cat] || 0) + 1;
@@ -60,13 +73,14 @@ function renderChips() {
   const cats = ["all", ...Object.keys(CATEGORY_LABELS).filter((c) => counts[c] && c !== "all")];
   $("#cat-tiles").innerHTML = cats.map((c) => {
     const img = (c === "all" ? top : cover[c])?.img || "";
-    return `<button class="cat-tile" data-cat="${c}" aria-pressed="${c === state.cat}">
-      <span class="cat-img"><img src="${img}" alt="" loading="lazy"></span>
+    const inner = `<span class="cat-img"><img src="${img}" alt="" loading="lazy"></span>
       <span class="cat-name">${CATEGORY_LABELS[c]}</span>
-      <span class="cat-count">${c === "all" ? products.length : counts[c]} produk</span>
-    </button>`;
+      <span class="cat-count">${c === "all" ? products.length : counts[c]} produk</span>`;
+    return linkOut
+      ? `<a class="cat-tile" href="${linkOut}${c === "all" ? "" : "?cat=" + c}">${inner}</a>`
+      : `<button class="cat-tile" data-cat="${c}" aria-pressed="${c === state.cat}">${inner}</button>`;
   }).join("");
-  $("#catalog-title").textContent = state.cat === "all" ? "Semua produk" : CATEGORY_LABELS[state.cat];
+  if ($("#catalog-title")) $("#catalog-title").textContent = state.cat === "all" ? "Semua produk" : CATEGORY_LABELS[state.cat];
 }
 
 function filtered() {
@@ -117,6 +131,7 @@ function card(p, { showPrice = true } = {}) {
 }
 
 function renderGrid() {
+  if (!$("#grid")) return;
   const list = filtered();
   $("#grid").innerHTML = list.length
     ? list.slice(0, state.shown).map((p) => card(p)).join("")
@@ -125,25 +140,34 @@ function renderGrid() {
   $("#more").hidden = list.length <= state.shown;
 }
 
-$("#cat-tiles").addEventListener("click", (e) => {
-  const b = e.target.closest(".cat-tile");
-  if (!b) return;
-  state.cat = b.dataset.cat;
-  state.shown = PAGE;
-  renderChips();
-  renderGrid();
-});
-let t;
-$("#q").addEventListener("input", (e) => {
-  clearTimeout(t);
-  t = setTimeout(() => { state.q = e.target.value; state.shown = PAGE; renderGrid(); }, 150);
-});
-$("#price").addEventListener("change", (e) => { state.price = e.target.value; state.shown = PAGE; renderGrid(); });
-$("#sort").addEventListener("change", (e) => { state.sort = e.target.value; renderGrid(); });
-$("#more").addEventListener("click", () => { state.shown += PAGE; renderGrid(); });
+if ($("#grid")) {
+  $("#cat-tiles").addEventListener("click", (e) => {
+    const b = e.target.closest("button.cat-tile");
+    if (!b) return;
+    state.cat = b.dataset.cat;
+    state.shown = PAGE;
+    history.replaceState(null, "", state.cat === "all" ? "katalog.html" : `katalog.html?cat=${state.cat}`);
+    renderChips();
+    renderGrid();
+  });
+  let t;
+  $("#q").addEventListener("input", (e) => {
+    clearTimeout(t);
+    t = setTimeout(() => { state.q = e.target.value; state.shown = PAGE; renderGrid(); }, 150);
+  });
+  $("#price").addEventListener("change", (e) => { state.price = e.target.value; state.shown = PAGE; renderGrid(); });
+  $("#sort").value = state.sort;
+  $("#sort").addEventListener("change", (e) => { state.sort = e.target.value; renderGrid(); });
+  $("#more").addEventListener("click", () => { state.shown += PAGE; renderGrid(); });
+}
+
+// ---- Home: most watched ----
+if ($("#home-grid")) {
+  $("#home-grid").innerHTML = [...products].sort((a, b) => b.views - a.views).slice(0, 8).map((p) => card(p)).join("");
+}
 
 // ---- Deliveries ----
-$("#deliveries").innerHTML = (window.DELIVERIES || []).slice(0, 4).map((p) => card(p, { showPrice: false })).join("");
+if ($("#deliveries")) $("#deliveries").innerHTML = (window.DELIVERIES || []).slice(0, 4).map((p) => card(p, { showPrice: false })).join("");
 
 // ---- Video player (TikTok official embed player) ----
 const byId = new Map([...products, ...(window.DELIVERIES || [])].map((p) => [p.id, p]));
@@ -231,18 +255,52 @@ async function loadApiCatalog() {
   }
 }
 
+/* ---- Order list ("keranjang") shared between pages ---- */
+const CART_KEY = "pp_pesanan";
+const cart = {
+  get() { try { return JSON.parse(localStorage.getItem(CART_KEY) || "[]"); } catch (e) { return []; } },
+  set(list) { try { localStorage.setItem(CART_KEY, JSON.stringify(list)); } catch (e) { /* storage blocked */ } updateCartBadge(); },
+};
+function updateCartBadge() {
+  const n = cart.get().length, el = $("#cart-count");
+  if (el) { el.textContent = n; el.hidden = !n; }
+}
+let toastTimer;
+function toast(html) {
+  const el = $("#toast");
+  el.innerHTML = html;
+  el.hidden = false;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => (el.hidden = true), 4000);
+}
+
 function addToOrder(name) {
   const ta = $("#order-produk");
-  const lines = ta.value.split("\n").map((l) => l.trim()).filter(Boolean);
-  if (!lines.some((l) => l.toLowerCase().startsWith(name.toLowerCase()))) lines.push(`${name} x1`);
-  ta.value = lines.join("\n");
-  document.getElementById("pesan").scrollIntoView({ behavior: "smooth" });
-  ta.classList.add("flash");
-  setTimeout(() => ta.classList.remove("flash"), 1200);
+  if (ta) {
+    const lines = ta.value.split("\n").map((l) => l.trim()).filter(Boolean);
+    if (!lines.some((l) => l.toLowerCase().startsWith(name.toLowerCase()))) lines.push(`${name} x1`);
+    ta.value = lines.join("\n");
+    ta.classList.add("flash");
+    setTimeout(() => ta.classList.remove("flash"), 1200);
+    return;
+  }
+  const list = cart.get();
+  if (!list.includes(name)) list.push(name);
+  cart.set(list);
+  if (!cart.get().length) { location.href = "pesan.html?produk=" + encodeURIComponent(name); return; }
+  toast(`✓ <b>${esc(name)}</b> ditambahkan ke pesanan. <a href="pesan.html">Lanjut isi formulir →</a>`);
+}
+updateCartBadge();
+
+// Pesan page: fill the form from the list (and ?produk= links)
+if ($("#order-produk")) {
+  const fromUrl = params.get("produk");
+  const items = [...cart.get(), ...(fromUrl ? [fromUrl] : [])];
+  if (items.length) $("#order-produk").value = [...new Set(items)].map((n) => `${n} x1`).join("\n");
 }
 
 // ---- Order form → admin app inbox ----
-$("#order-form").addEventListener("submit", async (e) => {
+if ($("#order-form")) $("#order-form").addEventListener("submit", async (e) => {
   e.preventDefault();
   const f = Object.fromEntries(new FormData(e.target));
   const msg = $("#order-msg");
@@ -257,6 +315,7 @@ $("#order-form").addEventListener("submit", async (e) => {
   btn.textContent = "Mengirim…";
   try {
     await callApi({ api: "order" }, f);
+    cart.set([]);
     const wa = waLink(`Halo Premium Perabot, saya ${f.nama} baru saja mengisi formulir pesanan di website:\n${f.produk}`);
     e.target.innerHTML = `<div class="form-done"><h3>Terima kasih, ${esc(f.nama.split(" ")[0])}! 🙏</h3>
       <p>Pesanan Anda sudah kami terima. Tim kami akan menghubungi Anda lewat WhatsApp untuk konfirmasi.</p>
@@ -271,7 +330,7 @@ $("#order-form").addEventListener("submit", async (e) => {
 
 // ---- Order tracking ----
 const STAGES = ["Antri", "Diproduksi", "Siap Kirim", "Terkirim"];
-$("#track-form").addEventListener("submit", async (e) => {
+if ($("#track-form")) $("#track-form").addEventListener("submit", async (e) => {
   e.preventDefault();
   const f = Object.fromEntries(new FormData(e.target));
   const msg = $("#track-msg"), out = $("#track-result"), btn = $("#track-submit");
@@ -307,10 +366,10 @@ $("#track-form").addEventListener("submit", async (e) => {
 });
 
 // Links from the WhatsApp nota: ?nota=xxxx#lacak
-const notaParam = new URLSearchParams(location.search).get("nota");
-if (notaParam) {
+const notaParam = params.get("nota");
+if (notaParam && $("#track-form")) {
   $("#track-form [name=nota]").value = notaParam;
-  setTimeout(() => { document.getElementById("lacak").scrollIntoView(); $("#track-form [name=hp]").focus(); }, 300);
+  $("#track-form [name=hp]").focus();
 }
 
-loadApiCatalog();
+if ($("#api-grid")) loadApiCatalog();

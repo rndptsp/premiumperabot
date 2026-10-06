@@ -1,0 +1,36 @@
+<!-- nav: Pesan -->
+<!-- title: Pesan Furnitur — Premium Perabot -->
+    <section class="page-hero">
+      <div class="wrap">
+        <h1>Pesan atau tanya harga</h1>
+        <p>Tidak perlu bayar sekarang. Kami konfirmasi dulu lewat WhatsApp.</p>
+      </div>
+    </section>
+
+    <section id="pesan" class="section section-alt">
+      <div class="wrap form-wrap">
+        <div>
+          <h2>Cara kerjanya</h2>
+          <p class="lead-sm">Isi formulir ini, tim kami akan menghubungi Anda lewat WhatsApp untuk konfirmasi harga, warna, ukuran, dan jadwal kirim. Tidak perlu bayar sekarang.</p>
+          <ul class="checks">
+            <li>Konsultasi gratis & bisa custom</li>
+            <li>Diantar sampai ke rumah</li>
+            <li>Bayar DP setelah pesanan dikonfirmasi</li>
+          </ul>
+        </div>
+        <form class="form-card" id="order-form" novalidate>
+          <div class="form-grid">
+            <label class="field"><span>Nama <i>*</i></span><input name="nama" autocomplete="name" required></label>
+            <label class="field"><span>No. HP / WhatsApp <i>*</i></span><input name="hp" type="tel" inputmode="tel" autocomplete="tel" placeholder="08…" required></label>
+            <label class="field full"><span>Produk yang diinginkan <i>*</i></span><textarea name="produk" id="order-produk" rows="4" placeholder="mis. Kamarset minimalis 5 jutaan x1&#10;Sofa jaguar x1" required></textarea></label>
+            <label class="field full"><span>Alamat pengiriman</span><input name="alamat" autocomplete="street-address" placeholder="Nagari / kecamatan / kota"></label>
+            <label class="field full"><span>Link lokasi Google Maps (opsional)</span><input name="maps" placeholder="Tempel link lokasi dari Google Maps"></label>
+            <label class="field"><span>Ingin dikirim tanggal</span><input name="tanggal" type="date"></label>
+            <label class="field"><span>Catatan</span><input name="catatan" placeholder="warna, ukuran, dll."></label>
+            <label class="hp-field" aria-hidden="true">Website<input name="website" tabindex="-1" autocomplete="off"></label>
+          </div>
+          <p class="form-msg" id="order-msg" role="status"></p>
+          <button class="btn btn-primary" type="submit" id="order-submit">Kirim pesanan</button>
+        </form>
+      </div>
+    </section>

@@ -1,0 +1,28 @@
+<!-- nav: Lacak Pesanan -->
+<!-- title: Lacak Pesanan — Premium Perabot -->
+    <section class="page-hero">
+      <div class="wrap">
+        <h1>Lacak pesanan</h1>
+        <p>Cek tahap produksi, jadwal kirim, dan sisa pembayaran pesanan Anda.</p>
+      </div>
+    </section>
+
+    <section id="lacak" class="section">
+      <div class="wrap form-wrap">
+        <div>
+          <h2>Masukkan data pesanan</h2>
+          <p class="lead-sm">Masukkan nomor nota (ada di nota WhatsApp dari kami) dan nomor HP yang dipakai saat memesan.</p>
+        </div>
+        <div>
+          <form class="form-card" id="track-form" novalidate>
+            <div class="form-grid">
+              <label class="field"><span>Nomor nota</span><input name="nota" placeholder="mis. d93abab9" autocomplete="off" required></label>
+              <label class="field"><span>No. HP</span><input name="hp" type="tel" inputmode="tel" placeholder="08…" required></label>
+            </div>
+            <p class="form-msg" id="track-msg" role="status"></p>
+            <button class="btn btn-primary" type="submit" id="track-submit">Lacak</button>
+          </form>
+          <div class="track-result" id="track-result" hidden></div>
+        </div>
+      </div>
+    </section>

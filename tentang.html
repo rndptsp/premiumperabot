@@ -3,9 +3,9 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Premium Perabot — Furnitur Mewah Harga Gudang, Payakumbuh</title>
+  <title>Tentang Kami — Premium Perabot</title>
   <meta name="description" content="Warehouse Premium Perabot, Tanjung Pauh, Payakumbuh. Kamar set, sofa, meja makan dan lemari model terbaru dengan harga gudang. Konsultasi gratis, bisa custom, diantar ke rumah.">
-  <meta property="og:title" content="Premium Perabot — Furnitur Mewah Harga Gudang, Payakumbuh">
+  <meta property="og:title" content="Tentang Kami — Premium Perabot">
   <meta property="og:description" content="Kamar set, sofa, meja makan & lemari langsung dari gudang di Payakumbuh.">
   <meta property="og:image" content="video/hero-poster.jpg">
   <meta name="theme-color" content="#2c2c2c">
@@ -15,14 +15,14 @@
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
-<body data-page="index">
+<body data-page="tentang">
   <header class="topbar">
     <div class="wrap topbar-inner">
       <a href="index.html" class="brand" aria-label="Premium Perabot — Beranda"><img class="logo-mark" src="img/logo-mark.svg" alt="" width="46" height="32"><span class="logo-text"><b>PREMIUM</b><i>PERABOT</i></span></a>
       <nav class="nav" id="site-nav" aria-label="Menu utama">
-        <a href="index.html" aria-current="page">Beranda</a>
+        <a href="index.html">Beranda</a>
         <a href="katalog.html">Katalog</a>
-        <a href="tentang.html">Tentang Kami</a>
+        <a href="tentang.html" aria-current="page">Tentang Kami</a>
         <a href="pesan.html">Pesan <span class="cart-count" id="cart-count" hidden></span></a>
         <a href="lacak.html">Lacak Pesanan</a>
         <a href="kontak.html">Kontak</a>
@@ -35,46 +35,14 @@
   </header>
 
   <main>
-    <section class="hero">
-      <div class="wrap hero-inner">
-        <div class="hero-media">
-          <video src="video/hero.mp4" poster="video/hero-poster.jpg" autoplay muted loop playsinline></video>
-        </div>
-        <div class="hero-text">
-          <p class="eyebrow">Warehouse Tanjung Pauh, Payakumbuh</p>
-          <h1>Furnitur mewah, <span>harga gudang</span></h1>
-          <p class="lead">Kamar set, sofa, meja makan dan lemari model terbaru, langsung dari gudang kami. Konsultasi gratis, bisa custom, diantar ke rumah.</p>
-          <div class="hero-cta">
-            <a href="katalog.html" class="btn btn-gold">Lihat katalog</a>
-            <a href="#" class="btn btn-outline-light js-wa" target="_blank" rel="noopener">Chat WhatsApp</a>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section class="usp">
-      <div class="wrap usp-inner">
-        <div><strong id="stat-products">300+</strong><span>model tersedia</span></div>
-        <div><strong id="stat-views">5 juta+</strong><span>penonton di TikTok</span></div>
-        <div><strong>Mulai Rp 1 jutaan</strong><span>harga terjangkau</span></div>
-        <div><strong>Antar ke rumah</strong><span>Payakumbuh & sekitarnya</span></div>
-      </div>
-    </section>
-
-    <section class="section">
+    <section class="page-hero">
       <div class="wrap">
-        <div class="section-head section-head-flex"><h2>Belanja berdasarkan kategori</h2><a class="link-more" href="katalog.html">Lihat semua produk →</a></div>
-        <div class="cat-tiles" id="cat-tiles" data-link="katalog.html"></div>
-      </div>
-    </section>
-    <section class="section section-alt">
-      <div class="wrap">
-        <div class="section-head section-head-flex"><h2>Paling banyak ditonton</h2><a class="link-more" href="katalog.html?sort=popular">Lihat katalog →</a></div>
-        <div class="grid" id="home-grid"></div>
+        <h1>Tentang Premium Perabot</h1>
+        <p>Warehouse furnitur di Tanjung Pauh, Payakumbuh. Harga gudang, bisa custom, diantar ke rumah.</p>
       </div>
     </section>
 
-    <section class="section">
+    <section id="keunggulan" class="section section-alt">
       <div class="wrap">
         <div class="section-head">
           <h2>Kenapa belanja di Premium Perabot?</h2>
@@ -101,6 +69,27 @@
             <p>Kami mengantar pesanan ke rumah pelanggan, termasuk ke luar Payakumbuh seperti Solok.</p>
           </article>
         </div>
+      </div>
+    </section>
+
+    <section id="pengantaran" class="section">
+      <div class="wrap">
+        <div class="section-head">
+          <h2>Pengantaran ke pelanggan</h2>
+          <p>Bukti nyata dari lapangan: barang sampai dengan aman di rumah pelanggan.</p>
+        </div>
+        <div class="grid grid-small" id="deliveries"></div>
+      </div>
+    </section>
+
+    <section class="section section-alt">
+      <div class="wrap">
+        <div class="section-head"><h2>Cara pesan</h2></div>
+        <ol class="steps">
+          <li><span>1</span><h3>Pilih model</h3><p>Lihat katalog atau video TikTok kami, simpan model yang Anda suka.</p></li>
+          <li><span>2</span><h3>Chat WhatsApp</h3><p>Kirim nama model, tanyakan harga terbaru, promo, dan opsi custom.</p></li>
+          <li><span>3</span><h3>Datang atau diantar</h3><p>Lihat langsung di gudang Tanjung Pauh, atau kami antar ke rumah Anda.</p></li>
+        </ol>
       </div>
     </section>
 
