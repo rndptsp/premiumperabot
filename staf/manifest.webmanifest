@@ -1,0 +1,13 @@
+{
+  "name": "Premium Perabot · Staf",
+  "short_name": "PP Staf",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#2c2c2c",
+  "theme_color": "#2c2c2c",
+  "icons": [
+    { "src": "../img/logo-avatar.jpg", "sizes": "any", "type": "image/jpeg" },
+    { "src": "../img/logo-mark.svg", "sizes": "any", "type": "image/svg+xml" }
+  ]
+}

@@ -6,7 +6,7 @@ const CONFIG = {
   mapsQuery: "Warehouse Premium Perabot, Tanjung Pauh, Payakumbuh Barat, Payakumbuh City, West Sumatra 26223",
   // Public API of the admin app (Google Apps Script "Link Publik"): catalog, order form, tracking.
   api: "https://script.google.com/macros/s/AKfycbx0-lUR6IlsUceei2AJ3VSQBe9AJB9YeZEBc6Yj21uCx-bbaENkhDeVN2IjKUdyTBfJIA/exec",
-  staffUrl: "https://script.google.com/macros/s/AKfycbzfRxn1oA_KiOhkyW-vjlqH3GqVdIO8FBuOqQXww-zV_z3Ng3bkYJAHxb_n53SPWHNmsQ/exec",
+  staffUrl: "staf/",
 };
 
 const CATEGORY_LABELS = {
