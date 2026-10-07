@@ -20,7 +20,20 @@ const CATEGORY_LABELS = {
 };
 const PAGE = 24;
 
-const products = window.PRODUCTS || [];
+// TikTok gallery = generated data/products.js + edits made by Admin/Staf in the app (Katalog Web):
+// new title or category, hidden, or "unggulan" (pinned first). Edits are cached so hidden items never flash.
+const BASE_PRODUCTS = window.PRODUCTS || [];
+const EDITS_KEY = "pp_katalog_edit";
+function cachedEdits() { try { return JSON.parse(localStorage.getItem(EDITS_KEY) || "[]"); } catch (e) { return []; } }
+function editedProducts(edits) {
+  const map = new Map(edits.map((e) => [String(e.id), e]));
+  return BASE_PRODUCTS.filter((p) => !map.get(p.id)?.sembunyikan).map((p) => {
+    const e = map.get(p.id);
+    return e ? { ...p, title: e.judul || p.title, cat: e.kategori || p.cat, pinned: !!e.unggulan } : p;
+  });
+}
+let products = editedProducts(cachedEdits());
+const pinnedFirst = (a, b) => (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0);
 const params = new URLSearchParams(location.search);
 const state = { cat: params.get("cat") || "all", q: "", sort: params.get("sort") === "popular" ? "popular" : "new", shown: PAGE };
 const PAGE_ID = document.body.dataset.page || "index";
@@ -93,7 +106,7 @@ function filtered() {
     new: (a, b) => b.date.localeCompare(a.date),
     popular: (a, b) => b.views - a.views,
   };
-  return list.sort(sorters[state.sort]);
+  return list.sort((a, b) => pinnedFirst(a, b) || sorters[state.sort](a, b));
 }
 
 const recentCutoff = [...products].sort((a, b) => b.date.localeCompare(a.date))[Math.min(11, products.length - 1)]?.date || "";
@@ -151,16 +164,18 @@ if ($("#grid")) {
   $("#more").addEventListener("click", () => { state.shown += PAGE; renderGrid(); });
 }
 
-// ---- Home: most watched ----
-if ($("#home-grid")) {
-  $("#home-grid").innerHTML = [...products].sort((a, b) => b.views - a.views).slice(0, 8).map((p) => card(p)).join("");
+// ---- Home: unggulan first, then most watched ----
+function renderHome() {
+  if ($("#home-grid")) $("#home-grid").innerHTML = [...products].sort((a, b) => pinnedFirst(a, b) || b.views - a.views).slice(0, 8).map((p) => card(p)).join("");
 }
+renderHome();
 
 // ---- Deliveries ----
 if ($("#deliveries")) $("#deliveries").innerHTML = (window.DELIVERIES || []).slice(0, 4).map((p) => card(p, { showPrice: false })).join("");
 
 // ---- Video player (TikTok official embed player) ----
-const byId = new Map([...products, ...(window.DELIVERIES || [])].map((p) => [p.id, p]));
+const buildById = () => new Map([...products, ...(window.DELIVERIES || [])].map((p) => [p.id, p]));
+let byId = buildById();
 const dlg = $("#player");
 
 function openPlayer(id) {
@@ -591,3 +606,17 @@ if (signedIn()) {
 }
 
 if ($("#api-grid")) loadApiCatalog();
+
+// Latest gallery edits from the app; redraw only if they changed since the cached copy.
+if ($("#grid") || $("#home-grid") || $("#cat-tiles")) {
+  callApi({ api: "katalog-edit" }).then((edits) => {
+    const fresh = JSON.stringify(edits);
+    if (fresh === JSON.stringify(cachedEdits())) return;
+    try { localStorage.setItem(EDITS_KEY, fresh); } catch (e) { /* storage blocked */ }
+    products = editedProducts(edits);
+    byId = buildById();
+    renderChips();
+    renderGrid();
+    renderHome();
+  }).catch(() => {});
+}
