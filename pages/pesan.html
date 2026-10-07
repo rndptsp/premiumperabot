@@ -18,10 +18,16 @@
             <li>Bayar DP setelah pesanan dikonfirmasi</li>
           </ul>
         </div>
-        <form class="form-card" id="order-form" novalidate>
+        <div class="form-card gate" id="order-gate" hidden>
+          <h3>Masuk untuk memesan</h3>
+          <p>Cukup sekali daftar: nama, nomor HP, dan password. Keranjang dan data alamat Anda tersimpan, dan status pesanan bisa dicek di <b>Pesanan Saya</b>.</p>
+          <button class="btn btn-primary" type="button" data-login="guest">Masuk / Daftar</button>
+          <a class="btn btn-wa js-wa" href="#" target="_blank" rel="noopener">Atau tanya dulu lewat WhatsApp</a>
+        </div>
+        <form class="form-card" id="order-form" novalidate hidden>
           <div class="form-grid">
             <label class="field"><span>Nama <i>*</i></span><input name="nama" autocomplete="name" required></label>
-            <label class="field"><span>No. HP / WhatsApp <i>*</i></span><input name="hp" type="tel" inputmode="tel" autocomplete="tel" placeholder="08…" required></label>
+            <label class="field"><span>No. HP / WhatsApp <i>*</i></span><input name="hp" type="tel" readonly title="Nomor akun Anda"></label>
             <label class="field full"><span>Produk yang diinginkan <i>*</i></span><textarea name="produk" id="order-produk" rows="4" placeholder="mis. Kamarset minimalis 5 jutaan x1&#10;Sofa jaguar x1" required></textarea></label>
             <label class="field full"><span>Alamat pengiriman</span><input name="alamat" autocomplete="street-address" placeholder="Nagari / kecamatan / kota"></label>
             <label class="field full"><span>Link lokasi Google Maps (opsional)</span><input name="maps" placeholder="Tempel link lokasi dari Google Maps"></label>

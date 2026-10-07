@@ -20,8 +20,17 @@
   </style>
 </head>
 <body>
-  <iframe src="https://script.google.com/macros/s/AKfycbzfRxn1oA_KiOhkyW-vjlqH3GqVdIO8FBuOqQXww-zV_z3Ng3bkYJAHxb_n53SPWHNmsQ/exec"
-          title="Premium Perabot · Staf" allow="camera; clipboard-write"></iframe>
+  <iframe title="Premium Perabot · Staf" allow="camera; clipboard-write"></iframe>
+  <script>
+    // ?c= is a one-time sign-in code from the website's Login popup (Staf tab); pass it on once, then drop it.
+    (function () {
+      var app = "https://script.google.com/macros/s/AKfycbzfRxn1oA_KiOhkyW-vjlqH3GqVdIO8FBuOqQXww-zV_z3Ng3bkYJAHxb_n53SPWHNmsQ/exec";
+      var c = new URLSearchParams(location.search).get("c");
+      var ok = c && /^[0-9a-f]{32}$/.test(c);
+      document.querySelector("iframe").src = ok ? app + "?c=" + c : app;
+      if (c) history.replaceState(null, "", location.pathname);
+    })();
+  </script>
   <a class="fallback" target="_top"
      href="https://script.google.com/macros/s/AKfycbzfRxn1oA_KiOhkyW-vjlqH3GqVdIO8FBuOqQXww-zV_z3Ng3bkYJAHxb_n53SPWHNmsQ/exec">Tidak terbuka? Buka langsung</a>
 </body>

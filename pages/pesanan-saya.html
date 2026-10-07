@@ -1,0 +1,32 @@
+<!-- nav: Pesanan Saya -->
+<!-- title: Pesanan Saya — Premium Perabot -->
+    <section class="page-hero">
+      <div class="wrap">
+        <h1>Pesanan Saya</h1>
+        <p>Tahap produksi, jadwal kirim, dan sisa pembayaran pesanan Anda.</p>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="wrap my-wrap">
+        <div class="form-card gate" id="my-gate" hidden>
+          <h3>Masuk untuk melihat pesanan</h3>
+          <p>Masuk dengan nomor HP dan password akun Anda.</p>
+          <button class="btn btn-primary" type="button" data-login="guest">Masuk / Daftar</button>
+        </div>
+        <div id="my-orders" hidden>
+          <p class="form-msg" id="my-msg" role="status"></p>
+          <div id="my-list"></div>
+          <form class="form-card link-form" id="link-form" novalidate>
+            <h3>Pesanan lama belum muncul?</h3>
+            <p class="auth-hint">Pesanan yang dibuat sebelum Anda punya akun bisa ditambahkan dengan nomor nota (ada di nota WhatsApp dari kami) dan nomor HP yang dipakai saat memesan.</p>
+            <div class="form-grid">
+              <label class="field"><span>Nomor nota</span><input name="nota" placeholder="mis. d93abab9" autocomplete="off" required></label>
+              <label class="field"><span>No. HP saat memesan</span><input name="hp" type="tel" inputmode="tel" required></label>
+            </div>
+            <p class="form-msg" role="status"></p>
+            <button class="btn btn-outline" type="submit">Tambahkan pesanan</button>
+          </form>
+        </div>
+      </div>
+    </section>

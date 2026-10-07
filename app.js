@@ -199,8 +199,6 @@ renderGrid();
 // =========================================================
 // Connection to the admin app (public API)
 // =========================================================
-document.querySelectorAll(".js-staff").forEach((a) => (a.href = CONFIG.staffUrl));
-
 async function callApi(params, body) {
   const url = CONFIG.api + "?" + new URLSearchParams(params);
   const res = await fetch(url, body
@@ -218,6 +216,7 @@ const fdateId = (s) => {
   return `${+d} ${["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agu", "Sep", "Okt", "Nov", "Des"][+m - 1]} ${y}`;
 };
 const tiktokId = (u) => (String(u || "").match(/video\/(\d+)/) || [])[1] || "";
+const cleanErr = (e) => String(e.message || e).replace(/^Error:\s*/, "");
 
 // ---- Products & prices from the admin app ----
 async function loadApiCatalog() {
@@ -245,14 +244,55 @@ async function loadApiCatalog() {
   }
 }
 
-/* ---- Order list ("keranjang") shared between pages ---- */
+/* ---- Customer account (Guest): phone + password. Browsing is open; ordering needs an account. ---- */
+const ACCT_KEY = "pp_akun";
+const account = {
+  get() { try { return JSON.parse(localStorage.getItem(ACCT_KEY) || "null"); } catch (e) { return null; } },
+  set(v) {
+    try { v ? localStorage.setItem(ACCT_KEY, JSON.stringify(v)) : localStorage.removeItem(ACCT_KEY); } catch (e) { /* storage blocked */ }
+    renderUserbar();
+  },
+};
+const signedIn = () => !!account.get()?.token;
+
+/** Calls that need the account: the token goes in the POST body. An expired session signs the visitor out. */
+async function callAccount(api, body = {}, { quiet = false } = {}) {
+  const a = account.get();
+  if (!a?.token) throw new Error("SESI_HABIS");
+  try {
+    return await callApi({ api }, { ...body, token: a.token });
+  } catch (e) {
+    if (/SESI_HABIS/.test(e.message)) {
+      account.set(null);
+      cart.set([], { sync: false });
+      if (!quiet) openAuth("guest", "Sesi Anda berakhir. Silakan masuk lagi.");
+    }
+    throw e;
+  }
+}
+
+function renderUserbar() {
+  const a = account.get();
+  if ($("#ub-name")) $("#ub-name").textContent = a ? a.akun.nama.split(" ")[0] : "Login";
+  $("#ub-login")?.classList.toggle("is-in", !!a);
+}
+
+/* ---- Cart ("keranjang"): kept in the account, cached on this device ---- */
 const CART_KEY = "pp_pesanan";
+let cartTimer;
 const cart = {
   get() { try { return JSON.parse(localStorage.getItem(CART_KEY) || "[]"); } catch (e) { return []; } },
-  set(list) { try { localStorage.setItem(CART_KEY, JSON.stringify(list)); } catch (e) { /* storage blocked */ } updateCartBadge(); },
+  set(list, { sync = true } = {}) {
+    try { localStorage.setItem(CART_KEY, JSON.stringify(list)); } catch (e) { /* storage blocked */ }
+    updateCartBadge();
+    if (sync && signedIn()) {
+      clearTimeout(cartTimer);
+      cartTimer = setTimeout(() => callAccount("keranjang", { items: cart.get() }, { quiet: true }).catch(() => {}), 400);
+    }
+  },
 };
 function updateCartBadge() {
-  const n = cart.get().length, el = $("#cart-count");
+  const n = signedIn() ? cart.get().length : 0, el = $("#cart-count");
   if (el) { el.textContent = n; el.hidden = !n; }
 }
 let toastTimer;
@@ -264,39 +304,164 @@ function toast(html) {
   toastTimer = setTimeout(() => (el.hidden = true), 4000);
 }
 
+/* ---- Login popup: Admin / Staf / Guest ---- */
+const authDlg = $("#auth");
+let afterLogin = null;
+
+function showGuestForm(which) {
+  ["login", "register", "forgot"].forEach((k) => ($(`#guest-${k}`).hidden = k !== which));
+  $(`#guest-${which} input:not([readonly])`)?.focus();
+}
+function openAuth(tab = "guest", note = "") {
+  if (tab === "guest" && signedIn()) tab = "account";
+  authDlg.querySelectorAll("[data-tab]").forEach((b) => b.setAttribute("aria-selected", String(b.dataset.tab === tab)));
+  $(".auth-tabs", authDlg).hidden = tab === "account";
+  authDlg.querySelectorAll("[data-panel]").forEach((p) => (p.hidden = p.dataset.panel !== tab));
+  $("#auth-note").textContent = note;
+  $("#auth-note").hidden = !note;
+  authDlg.querySelectorAll(".form-msg").forEach((m) => { m.textContent = ""; m.className = "form-msg"; });
+  if (tab === "guest") showGuestForm("login");
+  if (tab === "account") {
+    const a = account.get();
+    $("#acct-name").textContent = a.akun.nama;
+    $("#acct-hp").textContent = a.akun.hp;
+  }
+  if (!authDlg.open) authDlg.showModal();
+}
+/** Run `then` now if signed in, otherwise after the visitor signs in or registers. */
+function requireLogin(note, then) {
+  if (signedIn()) return then();
+  afterLogin = then;
+  openAuth("guest", note);
+}
+function signedInAs(data) {
+  account.set({ token: data.token, akun: data.akun });
+  const merged = [...new Set([...(data.keranjang || []), ...cart.get()])];
+  cart.set(merged, { sync: merged.length !== (data.keranjang || []).length });
+  authDlg.close();
+  toast(`Halo, <b>${esc(data.akun.nama.split(" ")[0])}</b>! Anda sudah masuk.`);
+  const next = afterLogin;
+  afterLogin = null;
+  if (next) next(); else refreshPage();
+}
+
+authDlg.addEventListener("close", () => { afterLogin = null; });
+authDlg.addEventListener("click", (e) => {
+  if (e.target === authDlg) authDlg.close();
+  const tab = e.target.closest("[data-tab]");
+  if (tab) openAuth(tab.dataset.tab);
+  const g = e.target.closest("[data-guest]");
+  if (g) { e.preventDefault(); showGuestForm(g.dataset.guest); }
+});
+$("#auth-close").addEventListener("click", () => authDlg.close());
+
+function bindForm(form, run) {
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const f = Object.fromEntries(new FormData(form));
+    const msg = $(".form-msg", form), btn = $("button[type=submit]", form), label = btn.textContent;
+    msg.className = "form-msg";
+    msg.textContent = "";
+    btn.disabled = true;
+    btn.textContent = "Mohon tunggu…";
+    try {
+      await run(f, msg);
+    } catch (err) {
+      msg.textContent = cleanErr(err);
+      msg.classList.add("err");
+    } finally {
+      btn.disabled = false;
+      btn.textContent = label;
+    }
+  });
+}
+
+bindForm($("#guest-login"), async (f) => signedInAs(await callApi({ api: "masuk" }, { hp: f.hp, pass: f.pass })));
+bindForm($("#guest-register"), async (f) => {
+  if (f.nama.trim().length < 2) throw new Error("Isi nama Anda.");
+  if (f.pass.length < 6) throw new Error("Password minimal 6 karakter.");
+  if (f.pass !== f.pass2) throw new Error("Ulangi password tidak sama.");
+  signedInAs(await callApi({ api: "daftar" }, f));
+});
+bindForm($("#guest-forgot"), async (f, msg) => {
+  await callApi({ api: "lupa" }, { hp: f.hp });
+  msg.textContent = "Permintaan terkirim. Admin kami akan mengirim password baru lewat WhatsApp ke nomor tersebut.";
+});
+bindForm($("#staf-form"), async (f) => {
+  const { code } = await callApi({ api: "staf" }, { nama: f.nama, pin: f.pin });
+  location.href = CONFIG.staffUrl + "?c=" + code;
+});
+$("#acct-logout").addEventListener("click", async () => {
+  const a = account.get();
+  account.set(null);
+  cart.set([], { sync: false });
+  authDlg.close();
+  toast("Anda sudah keluar.");
+  if (a?.token) callApi({ api: "keluar" }, { token: a.token }).catch(() => {});
+  refreshPage();
+});
+
+// User bar: Login · Keranjang · Pesanan Saya
+$("#ub-login").addEventListener("click", () => openAuth(signedIn() ? "account" : "guest"));
+$("#ub-cart").addEventListener("click", (e) => {
+  if (signedIn()) return;
+  e.preventDefault();
+  requireLogin("Masuk dulu untuk melihat keranjang dan memesan.", () => (location.href = "pesan.html"));
+});
+$("#ub-orders").addEventListener("click", (e) => {
+  if (signedIn()) return;
+  e.preventDefault();
+  requireLogin("Masuk untuk melihat pesanan Anda.", () => (location.href = "pesanan-saya.html"));
+});
+document.addEventListener("click", (e) => {
+  const b = e.target.closest("[data-login]");
+  if (b) openAuth(b.dataset.login);
+});
+
 function addToOrder(name) {
+  if (!signedIn()) {
+    requireLogin("Masuk dulu untuk memesan. Cukup nama, nomor HP, dan password.", () => addToOrder(name));
+    return;
+  }
   const ta = $("#order-produk");
-  if (ta) {
+  if (ta && !$("#order-form").hidden) {
     const lines = ta.value.split("\n").map((l) => l.trim()).filter(Boolean);
     if (!lines.some((l) => l.toLowerCase().startsWith(name.toLowerCase()))) lines.push(`${name} x1`);
     ta.value = lines.join("\n");
     ta.classList.add("flash");
     setTimeout(() => ta.classList.remove("flash"), 1200);
-    return;
   }
   const list = cart.get();
   if (!list.includes(name)) list.push(name);
   cart.set(list);
+  if (ta) return;
   if (!cart.get().length) { location.href = "pesan.html?produk=" + encodeURIComponent(name); return; }
-  toast(`✓ <b>${esc(name)}</b> ditambahkan ke pesanan. <a href="pesan.html">Lanjut isi formulir →</a>`);
+  toast(`✓ <b>${esc(name)}</b> masuk keranjang. <a href="pesan.html">Lanjut pesan →</a>`);
 }
-updateCartBadge();
 
-// Pesan page: fill the form from the list (and ?produk= links)
-if ($("#order-produk")) {
+// ---- Order form (signed-in customers) → admin app inbox ----
+function setupOrderPage() {
+  if (!$("#order-form")) return;
+  const a = account.get();
+  $("#order-gate").hidden = !!a;
+  $("#order-form").hidden = !a;
+  if (!a) return;
+  const form = $("#order-form");
+  if (!form.nama.value) form.nama.value = a.akun.nama;
+  form.hp.value = a.akun.hp;
+  if (!form.alamat.value) form.alamat.value = a.akun.alamat || "";
   const fromUrl = params.get("produk");
   const items = [...cart.get(), ...(fromUrl ? [fromUrl] : [])];
-  if (items.length) $("#order-produk").value = [...new Set(items)].map((n) => `${n} x1`).join("\n");
+  if (items.length && !form.produk.value) form.produk.value = [...new Set(items)].map((n) => `${n} x1`).join("\n");
 }
 
-// ---- Order form → admin app inbox ----
 if ($("#order-form")) $("#order-form").addEventListener("submit", async (e) => {
   e.preventDefault();
   const f = Object.fromEntries(new FormData(e.target));
   const msg = $("#order-msg");
   msg.className = "form-msg";
-  if (!f.nama.trim() || f.hp.replace(/\D/g, "").length < 10 || !f.produk.trim()) {
-    msg.textContent = "Isi nama, nomor HP/WA yang benar, dan produk yang diinginkan.";
+  if (!f.nama.trim() || !f.produk.trim()) {
+    msg.textContent = "Isi nama dan produk yang diinginkan.";
     msg.classList.add("err");
     return;
   }
@@ -304,36 +469,30 @@ if ($("#order-form")) $("#order-form").addEventListener("submit", async (e) => {
   btn.disabled = true;
   btn.textContent = "Mengirim…";
   try {
-    await callApi({ api: "order" }, f);
-    cart.set([]);
+    await callAccount("order", f);
+    cart.set([], { sync: false });
+    const a = account.get();
+    if (a && f.alamat) account.set({ ...a, akun: { ...a.akun, alamat: f.alamat } });
     const wa = waLink(`Halo Premium Perabot, saya ${f.nama} baru saja mengisi formulir pesanan di website:\n${f.produk}`);
     e.target.innerHTML = `<div class="form-done"><h3>Terima kasih, ${esc(f.nama.split(" ")[0])}! 🙏</h3>
-      <p>Pesanan Anda sudah kami terima. Tim kami akan menghubungi Anda lewat WhatsApp untuk konfirmasi.</p>
+      <p>Pesanan Anda sudah kami terima. Tim kami akan menghubungi Anda lewat WhatsApp untuk konfirmasi. Statusnya bisa dicek di <a href="pesanan-saya.html"><b>Pesanan Saya</b></a>.</p>
       <a class="btn btn-wa" href="${wa}" target="_blank" rel="noopener">Chat sekarang di WhatsApp</a></div>`;
   } catch (err) {
-    msg.textContent = err.message + " Anda juga bisa langsung chat WhatsApp.";
+    if (/SESI_HABIS/.test(err.message)) { setupOrderPage(); return; }
+    msg.textContent = cleanErr(err) + " Anda juga bisa langsung chat WhatsApp.";
     msg.classList.add("err");
+  } finally {
     btn.disabled = false;
     btn.textContent = "Kirim pesanan";
   }
 });
 
-// ---- Order tracking ----
+// ---- Order cards (tracking page and Pesanan Saya) ----
 const STAGES = ["Antri", "Diproduksi", "Siap Kirim", "Terkirim"];
-if ($("#track-form")) $("#track-form").addEventListener("submit", async (e) => {
-  e.preventDefault();
-  const f = Object.fromEntries(new FormData(e.target));
-  const msg = $("#track-msg"), out = $("#track-result"), btn = $("#track-submit");
-  msg.className = "form-msg";
-  msg.textContent = "";
-  out.hidden = true;
-  btn.disabled = true;
-  btn.textContent = "Mencari…";
-  try {
-    const o = await callApi({ api: "track", nota: f.nota.trim(), hp: f.hp });
-    const cur = Math.max(0, STAGES.indexOf(o.status));
-    out.innerHTML = `
-      <div class="track-head"><div><span class="muted">Nota #${esc(o.nota)}</span><h3>Halo, ${esc(o.nama)}</h3></div>
+function orderCardHtml(o, { greet = false } = {}) {
+  const cur = Math.max(0, STAGES.indexOf(o.status));
+  return `
+      <div class="track-head"><div><span class="muted">Nota #${esc(o.nota)}</span><h3>${greet ? `Halo, ${esc(o.nama)}` : o.items.length ? esc(o.items[0].produk) + (o.items.length > 1 ? ` +${o.items.length - 1}` : "") : "Pesanan"}</h3></div>
         <span class="track-status">${o.status === "Batal" ? "Dibatalkan" : esc(o.status)}</span></div>
       ${o.status === "Batal" ? "" : `<ol class="track-steps">${STAGES.map((s, i) => `<li class="${i < cur ? "done" : i === cur ? "current" : ""}"><i></i><span>${s}</span></li>`).join("")}</ol>`}
       <dl class="track-info">
@@ -345,9 +504,24 @@ if ($("#track-form")) $("#track-form").addEventListener("submit", async (e) => {
       </dl>
       ${o.items.length ? `<p class="track-items">${o.items.map((i) => `${esc(i.produk)}${i.qty > 1 ? ` ×${i.qty}` : ""}`).join(" · ")}</p>` : ""}
       <a class="btn btn-wa btn-sm" target="_blank" rel="noopener" href="${waLink(`Halo Premium Perabot, saya ingin menanyakan pesanan nota #${o.nota}.`)}">Tanya soal pesanan ini</a>`;
+}
+
+// ---- Order tracking (no account needed: nota + phone) ----
+if ($("#track-form")) $("#track-form").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const f = Object.fromEntries(new FormData(e.target));
+  const msg = $("#track-msg"), out = $("#track-result"), btn = $("#track-submit");
+  msg.className = "form-msg";
+  msg.textContent = "";
+  out.hidden = true;
+  btn.disabled = true;
+  btn.textContent = "Mencari…";
+  try {
+    const o = await callApi({ api: "track", nota: f.nota.trim(), hp: f.hp });
+    out.innerHTML = orderCardHtml(o, { greet: true });
     out.hidden = false;
   } catch (err) {
-    msg.textContent = err.message;
+    msg.textContent = cleanErr(err);
     msg.classList.add("err");
   } finally {
     btn.disabled = false;
@@ -355,11 +529,65 @@ if ($("#track-form")) $("#track-form").addEventListener("submit", async (e) => {
   }
 });
 
-// Links from the WhatsApp nota: ?nota=xxxx#lacak
+// Links from the WhatsApp nota: ?nota=xxxx
 const notaParam = params.get("nota");
 if (notaParam && $("#track-form")) {
   $("#track-form [name=nota]").value = notaParam;
   $("#track-form [name=hp]").focus();
+}
+
+// ---- Pesanan Saya ----
+async function loadMyOrders() {
+  if (!$("#my-orders")) return;
+  const a = account.get();
+  $("#my-gate").hidden = !!a;
+  $("#my-orders").hidden = !a;
+  if (!a) return;
+  if (!$("#link-form").hp.value) $("#link-form").hp.value = a.akun.hp;
+  const list = $("#my-list"), msg = $("#my-msg");
+  list.innerHTML = '<p class="muted">Memuat pesanan…</p>';
+  msg.textContent = "";
+  try {
+    const d = await callAccount("pesanan-saya");
+    const reqs = d.permintaan.map((r) => `<div class="track-result my-req">
+        <div class="track-head"><div><span class="muted">Dikirim ${fdateId(r.tanggal)}</span><h3>Permintaan pesanan</h3></div>
+          <span class="track-status ${r.status === "Ditolak" ? "is-off" : "is-wait"}">${r.status === "Ditolak" ? "Tidak diproses" : "Menunggu konfirmasi"}</span></div>
+        <p class="track-items" style="white-space:pre-line">${esc(r.produk)}</p>
+        ${r.status === "Ditolak" ? `<p class="muted">Permintaan ini tidak kami proses. Silakan hubungi kami jika ada pertanyaan.</p>` : `<p class="muted">Tim kami akan menghubungi Anda lewat WhatsApp untuk konfirmasi harga dan jadwal.</p>`}
+      </div>`).join("");
+    const orders = d.pesanan.map((o) => `<div class="track-result">${orderCardHtml(o)}</div>`).join("");
+    list.innerHTML = reqs + orders || `<div class="empty-orders"><h3>Belum ada pesanan</h3>
+      <p>Pilih produk di <a href="katalog.html">katalog</a>, lalu klik <b>+ Pesan</b>.</p></div>`;
+  } catch (err) {
+    list.innerHTML = "";
+    if (!/SESI_HABIS/.test(err.message)) { msg.textContent = cleanErr(err); msg.classList.add("err"); }
+    else loadMyOrders();
+  }
+}
+if ($("#link-form")) bindForm($("#link-form"), async (f, msg) => {
+  const o = await callAccount("tautkan", { nota: f.nota.trim(), hp: f.hp });
+  $("#link-form").nota.value = "";
+  await loadMyOrders();
+  msg.textContent = `Pesanan #${o.nota} ditambahkan ke akun Anda.`;
+});
+
+/** Re-draw the parts of the page that depend on being signed in. */
+function refreshPage() {
+  renderUserbar();
+  updateCartBadge();
+  setupOrderPage();
+  loadMyOrders();
+}
+
+// Start: show the account state, then confirm the session and fetch the saved cart in the background.
+refreshPage();
+if (signedIn()) {
+  callAccount("akun", {}, { quiet: true }).then((d) => {
+    const a = account.get();
+    account.set({ ...a, akun: d.akun });
+    cart.set(d.keranjang, { sync: false });
+    setupOrderPage();
+  }).catch(() => refreshPage());
 }
 
 if ($("#api-grid")) loadApiCatalog();

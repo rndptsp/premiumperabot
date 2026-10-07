@@ -256,6 +256,62 @@ a.cat-tile { text-decoration: none; color: inherit; }
 .btn-outline { background: #fff; color: var(--ink); border-color: var(--line); }
 
 /* Responsive */
+/* User bar (top-left): Login · Keranjang · Pesanan Saya */
+.userbar { background: var(--charcoal); color: #fff; font-size: 13px; }
+.userbar-inner { display: flex; align-items: center; gap: 4px; height: 36px; }
+.ub-btn { display: inline-flex; align-items: center; gap: 6px; height: 28px; padding: 0 10px; border: 0; border-radius: 99px; background: transparent; color: #f1ece3; font: 700 13px/1 var(--sans); text-decoration: none; cursor: pointer; white-space: nowrap; }
+.ub-btn:hover { background: rgba(255,255,255,.1); color: #fff; }
+.ub-btn svg { width: 16px; height: 16px; fill: none; stroke: var(--gold); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+#ub-login { background: var(--gold); color: var(--charcoal); }
+#ub-login svg { stroke: var(--charcoal); }
+#ub-login.is-in { background: rgba(217,170,60,.18); color: var(--gold); }
+#ub-login.is-in svg { stroke: var(--gold); }
+.userbar .cart-count { margin-left: 2px; }
+
+/* Login dialog */
+.btn-dark { background: var(--charcoal); color: #fff; }
+.btn-dark:hover { background: var(--charcoal-dark); }
+.g-icon { width: 20px; height: 20px; background: #fff; border-radius: 50%; padding: 2px; }
+.auth { border: 0; padding: 0; width: min(420px, 100vw - 32px); max-height: calc(100dvh - 32px); overflow-y: auto; background: #fff; color: var(--ink); border-top: 4px solid var(--gold); }
+.auth::backdrop { background: rgba(0, 0, 0, .6); }
+.auth-inner { position: relative; padding: 22px 24px 26px; }
+.auth-tabs { display: flex; gap: 4px; background: var(--bg-alt); padding: 4px; border-radius: 99px; margin: 0 48px 18px 0; }
+.auth-tabs[hidden] { display: none; }
+.auth-tabs button { flex: 1; min-height: 38px; border: 0; border-radius: 99px; background: transparent; font: 700 14px var(--sans); color: var(--ink-soft); cursor: pointer; }
+.auth-tabs button[aria-selected="true"] { background: var(--charcoal); color: var(--gold); }
+.auth-note { background: var(--gold-light); color: #5c3f0c; padding: 10px 12px; border-radius: 8px; font-size: 13.5px; margin: 0 0 14px; }
+.auth-panel h3 { font-size: 20px; font-weight: 800; margin-bottom: 10px; }
+.auth-panel .btn { width: 100%; margin-top: 10px; }
+.auth-hint { color: var(--ink-soft); font-size: 14px; margin: 0 0 12px; }
+.auth-form { display: flex; flex-direction: column; gap: 10px; }
+.auth-form[hidden], .auth-panel[hidden] { display: none; }
+.auth-form .field, .link-form .field { display: flex; flex-direction: column; gap: 5px; }
+.auth-form .field span { font-size: 13px; font-weight: 700; }
+.auth-form .field small { font-weight: 500; color: var(--ink-mute); }
+.auth-form input { width: 100%; border: 1px solid var(--line); background: #fff; border-radius: 8px; padding: 11px 12px; font: 16px var(--sans); color: var(--ink); outline: none; }
+.auth-form input:focus { border-color: var(--gold); box-shadow: 0 0 0 3px rgba(217,170,60,.2); }
+.auth-form .form-msg { margin: 0; min-height: 0; }
+.auth-form .btn { margin-top: 4px; }
+.auth-links { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; margin: 6px 0 0; font-size: 14px; }
+.auth-links a { color: var(--ink-soft); }
+
+/* Order page gate, Pesanan Saya */
+.gate h3 { font-size: 20px; font-weight: 800; margin-bottom: 8px; }
+.gate p { color: var(--ink-soft); margin: 0 0 8px; }
+.gate .btn { width: 100%; margin-top: 10px; }
+.form-card[hidden], #my-orders[hidden] { display: none; }
+.form-card input[readonly] { background: var(--bg-alt); color: var(--ink-soft); }
+.my-wrap { max-width: 760px; }
+.my-wrap .track-result { margin: 0 0 16px; }
+.track-status.is-wait { background: var(--gold-light); color: #5c3f0c; }
+.track-status.is-off { background: #eee; color: #777; }
+.my-req .muted { color: var(--ink-mute); font-size: 14px; margin: 6px 0 0; }
+.empty-orders { text-align: center; padding: 36px 16px; background: var(--bg-alt); margin-bottom: 16px; }
+.empty-orders h3 { font-size: 20px; margin-bottom: 6px; }
+.link-form { margin-top: 24px; }
+.link-form h3 { font-size: 18px; font-weight: 800; margin-bottom: 6px; }
+.link-form .btn { width: auto; }
+
 @media (max-width: 1000px) {
   .features { grid-template-columns: repeat(2, 1fr); }
   .cat-tiles { grid-template-columns: repeat(7, 130px); }
@@ -301,6 +357,8 @@ a.cat-tile { text-decoration: none; color: inherit; }
   .player-info .price b { font-size: 26px; }
 }
 @media (max-width: 480px) {
+  .ub-btn { padding: 0 8px; font-size: 12.5px; }
+  .ub-btn svg { width: 14px; height: 14px; }
   .features { grid-template-columns: 1fr; }
   .filters { position: static; }
   .search { flex-basis: 100%; }
