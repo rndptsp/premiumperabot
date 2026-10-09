@@ -7,9 +7,12 @@ Katalog produk diambil dari video TikTok [@premiumperabot](https://www.tiktok.co
 Ubah nomor WhatsApp, Instagram, dan lokasi Google Maps di bagian atas `app.js` (`CONFIG`).
 
 ## Perbarui katalog dari TikTok
-Di Mac, dari folder ini: `./update_tiktok.sh`
-Script mengambil caption + gambar sampul semua video (tanpa file video), memperbarui jumlah views,
-menambah video baru, lalu commit & push. Butuh `yt-dlp` (`brew install yt-dlp`).
+Di Mac, dari folder ini:
+- `./update_tiktok.sh` — cepat: hanya video **baru** di 40 postingan terakhir (video lama dilewati).
+- `./update_tiktok.sh semua` — lama: baca ulang semua video (sekalian memperbarui jumlah views).
+Hanya caption + gambar sampul yang diambil (tanpa file video), lalu commit & push otomatis.
+Pengaman: kalau jumlah produk turun lebih dari 10% (folder sumber tidak lengkap), website tidak diubah.
+Butuh `yt-dlp` (`brew install yt-dlp`).
 Editan di aplikasi (Katalog Web: judul, kategori, sembunyikan, unggulan) tetap berlaku.
 Catatan: hanya video yang captionnya menyebut harga (mis. "5 Jutaan") dianggap produk; video pengantaran masuk bagian Pengantaran.
 
