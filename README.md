@@ -6,10 +6,12 @@ Katalog produk diambil dari video TikTok [@premiumperabot](https://www.tiktok.co
 ## Edit kontak
 Ubah nomor WhatsApp, Instagram, dan lokasi Google Maps di bagian atas `app.js` (`CONFIG`).
 
-## Perbarui katalog
-1. Download video TikTok terbaru dengan yt-dlp ke folder `~/premiumperabot`.
-2. Jalankan `python3 build_site.py` lalu `python3 build_pages.py` di folder ini (build_pages memperbarui kode versi file, supaya browser tidak memakai versi lama).
-3. Commit dan push — GitHub Pages akan memperbarui situs otomatis.
+## Perbarui katalog dari TikTok
+Di Mac, dari folder ini: `./update_tiktok.sh`
+Script mengambil caption + gambar sampul semua video (tanpa file video), memperbarui jumlah views,
+menambah video baru, lalu commit & push. Butuh `yt-dlp` (`brew install yt-dlp`).
+Editan di aplikasi (Katalog Web: judul, kategori, sembunyikan, unggulan) tetap berlaku.
+Catatan: hanya video yang captionnya menyebut harga (mis. "5 Jutaan") dianggap produk; video pengantaran masuk bagian Pengantaran.
 
 ## Login & akun pelanggan
 - Bar atas (semua halaman): **Login · Keranjang · Pesanan Saya**.
