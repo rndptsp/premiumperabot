@@ -38,7 +38,7 @@ LAYOUT = """<!doctype html>
   <meta name="description" content="{description}">
   <meta property="og:title" content="{title}">
   <meta property="og:description" content="Kamar set, sofa, meja makan & lemari langsung dari gudang di Payakumbuh.">
-  <meta property="og:image" content="video/hero-poster.jpg">
+  <meta property="og:image" content="https://premiumperabot.com/img/toko-1200.jpg">
   <meta name="theme-color" content="#2c2c2c">
   <link rel="icon" href="img/logo-mark.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
