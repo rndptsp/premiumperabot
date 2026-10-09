@@ -29,7 +29,7 @@ function editedProducts(edits) {
   const map = new Map(edits.map((e) => [String(e.id), e]));
   return BASE_PRODUCTS.filter((p) => !map.get(p.id)?.sembunyikan).map((p) => {
     const e = map.get(p.id);
-    return e ? { ...p, title: e.judul || p.title, cat: e.kategori || p.cat, pinned: !!e.unggulan } : p;
+    return e ? { ...p, title: e.judul || p.title, cat: e.kategori || p.cat, pinned: !!e.unggulan, harga: Number(e.harga) || 0 } : p;
   });
 }
 let products = editedProducts(cachedEdits());
@@ -114,8 +114,10 @@ const popularCutoff = [...products].sort((a, b) => b.views - a.views)[Math.min(1
 // Values from the sheet can be numbers (e.g. an all-digit nota), so always convert to text first.
 const esc = (t) => String(t ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 
-// TikTok captions carry old prices, so the video catalog never shows them; current prices come from the admin app.
+// TikTok captions carry old prices, so they are never shown. A price appears only when Admin sets one
+// in the app (Katalog Web); otherwise "Call / WhatsApp".
 const ASK_PRICE = '<p class="price price-ask"><sup>Rp</sup><b>Call / WhatsApp</b></p>';
+const priceOf = (p) => (p.harga ? `<p class="price"><sup>Rp</sup><b>${Math.round(p.harga).toLocaleString("id-ID")}</b></p>` : ASK_PRICE);
 
 function card(p, { showPrice = true } = {}) {
   const badge = p.date >= recentCutoff ? `<span class="badge badge-new">Baru</span>`
@@ -130,7 +132,7 @@ function card(p, { showPrice = true } = {}) {
         ${badge}
         <h3>${esc(p.title)}</h3>
         <p class="card-cat">${p.cat ? CATEGORY_LABELS[p.cat] : "Pengantaran"} · ${fmtViews(p.views)} views</p>
-        ${showPrice ? ASK_PRICE : ""}
+        ${showPrice ? priceOf(p) : ""}
       </div>
     </article>`;
 }
@@ -185,7 +187,7 @@ function openPlayer(id) {
   $("#player-iframe").src = `https://www.tiktok.com/player/v1/${p.id}?autoplay=1&loop=1&rel=0&description=0&music_info=0`;
   $("#player-cat").textContent = p.cat ? CATEGORY_LABELS[p.cat] : "Pengantaran";
   $("#player-title").textContent = p.title;
-  $("#player-price").outerHTML = (p.cat ? ASK_PRICE : '<p class="price"></p>').replace('<p class="price', '<p id="player-price" class="price');
+  $("#player-price").outerHTML = (p.cat ? priceOf(p) : '<p class="price"></p>').replace('<p class="price', '<p id="player-price" class="price');
   $("#player-wa").href = waLink(`Halo Premium Perabot, saya tertarik dengan "${p.title}". Apakah masih tersedia? ${p.url}`);
   $("#player-link").href = p.url;
   $("#player-order").onclick = () => { closePlayer(); addToOrder(p.title); };
