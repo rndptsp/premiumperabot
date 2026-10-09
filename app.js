@@ -505,6 +505,44 @@ if ($("#order-form")) $("#order-form").addEventListener("submit", async (e) => {
   }
 });
 
+// ---- Voucher code on the order form (the shop applies the discount when confirming the order) ----
+if ($("#voucher-check")) $("#voucher-check").addEventListener("click", async () => {
+  const input = $("#order-form [name=voucher]"), msg = $("#voucher-msg");
+  const kode = input.value.trim();
+  msg.className = "voucher-msg";
+  if (!kode) { msg.textContent = "Isi kode voucher dulu."; return; }
+  msg.textContent = "Memeriksa…";
+  try {
+    const v = await callApi({ api: "voucher", kode });
+    input.value = v.kode;
+    msg.textContent = `✓ ${v.kode}: ${v.label}. Potongan dihitung saat pesanan dikonfirmasi.`;
+    msg.classList.add("ok");
+  } catch (e) {
+    msg.textContent = cleanErr(e);
+    msg.classList.add("err");
+  }
+});
+
+// ---- Promo banner (vouchers the shop marked "tampilkan sebagai promo") ----
+async function loadPromos() {
+  let promos = null;
+  try { const c = JSON.parse(sessionStorage.getItem("pp_promo") || "null"); if (c && Date.now() - c.t < 300000) promos = c.d; } catch (e) { /* none */ }
+  if (!promos) {
+    try {
+      promos = await callApi({ api: "promo" });
+      try { sessionStorage.setItem("pp_promo", JSON.stringify({ t: Date.now(), d: promos })); } catch (e) { /* storage blocked */ }
+    } catch (e) { return; }
+  }
+  if (!promos.length) return;
+  const bar = document.createElement("div");
+  bar.className = "promo-bar";
+  bar.innerHTML = `<div class="wrap">${promos.map((p) => `<p><span class="promo-tag">PROMO</span> <b>${esc(p.judul)}</b> · pakai kode <code>${esc(p.kode)}</code>
+    <a href="pesan.html?voucher=${encodeURIComponent(p.kode)}">Pesan sekarang →</a></p>`).join("")}</div>`;
+  document.querySelector(".topbar").after(bar);
+}
+loadPromos();
+if ($("#order-form") && params.get("voucher")) $("#order-form [name=voucher]").value = params.get("voucher");
+
 // ---- Order cards (tracking page and Pesanan Saya) ----
 const STAGES = ["Antri", "Diproduksi", "Siap Kirim", "Terkirim"];
 function orderCardHtml(o, { greet = false } = {}) {
@@ -516,6 +554,7 @@ function orderCardHtml(o, { greet = false } = {}) {
       <dl class="track-info">
         <div><dt>Tanggal pesan</dt><dd>${fdateId(o.tanggalOrder)}</dd></div>
         <div><dt>Jadwal kirim</dt><dd>${fdateId(o.tanggalKirim)}</dd></div>
+        ${o.diskon ? `<div><dt>Diskon</dt><dd>− ${fmtRp(o.diskon)}</dd></div>` : ""}
         <div><dt>Total</dt><dd>${fmtRp(o.total)}</dd></div>
         <div><dt>Sudah dibayar</dt><dd>${fmtRp(o.terbayar)}</dd></div>
         <div class="${o.sisa > 0 ? "owe" : "paid"}"><dt>Sisa pembayaran</dt><dd>${o.sisa > 0 ? fmtRp(o.sisa) : "LUNAS ✓"}</dd></div>

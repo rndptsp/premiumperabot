@@ -313,6 +313,19 @@ a.cat-tile { text-decoration: none; color: inherit; }
 .link-form h3 { font-size: 18px; font-weight: 800; margin-bottom: 6px; }
 .link-form .btn { width: auto; }
 
+.promo-bar { background: var(--gold-light); border-bottom: 1px solid #ecd9a8; color: #5c3f0c; font-size: 14px; }
+.promo-bar p { margin: 0; padding: 9px 0; display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.promo-bar p + p { border-top: 1px dashed #ecd9a8; }
+.promo-tag { background: var(--maroon); color: #fff; font-size: 11px; font-weight: 800; letter-spacing: .06em; padding: 2px 7px; border-radius: 4px; }
+.promo-bar code { background: #fff; border: 1px dashed var(--gold-dark); padding: 1px 6px; border-radius: 4px; font-weight: 800; color: var(--ink); }
+.promo-bar a { color: var(--maroon); font-weight: 800; margin-left: auto; }
+.voucher-row { display: flex; gap: 8px; }
+.voucher-row input { flex: 1; text-transform: uppercase; }
+.voucher-row .btn { width: auto; margin-top: 0; min-height: 44px; }
+.voucher-msg { font-size: 13px; color: var(--ink-soft); }
+.voucher-msg.ok { color: #1e7a3c; font-weight: 600; }
+.voucher-msg.err { color: var(--maroon); font-weight: 600; }
+
 @media (max-width: 1000px) {
   .features { grid-template-columns: repeat(2, 1fr); }
   .cat-tiles { grid-template-columns: repeat(7, 130px); }

@@ -33,6 +33,9 @@
             <label class="field full"><span>Link lokasi Google Maps (opsional)</span><input name="maps" placeholder="Tempel link lokasi dari Google Maps"></label>
             <label class="field"><span>Ingin dikirim tanggal</span><input name="tanggal" type="date"></label>
             <label class="field"><span>Catatan</span><input name="catatan" placeholder="warna, ukuran, dll."></label>
+            <div class="field full"><span>Kode voucher (opsional)</span>
+              <div class="voucher-row"><input name="voucher" placeholder="mis. OKTOBER10" autocapitalize="characters" autocomplete="off"><button class="btn btn-outline btn-sm" type="button" id="voucher-check">Cek</button></div>
+              <small class="voucher-msg" id="voucher-msg"></small></div>
             <label class="hp-field" aria-hidden="true">Website<input name="website" tabindex="-1" autocomplete="off"></label>
           </div>
           <p class="form-msg" id="order-msg" role="status"></p>
