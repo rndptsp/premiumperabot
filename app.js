@@ -111,7 +111,8 @@ function filtered() {
 
 const recentCutoff = [...products].sort((a, b) => b.date.localeCompare(a.date))[Math.min(11, products.length - 1)]?.date || "";
 const popularCutoff = [...products].sort((a, b) => b.views - a.views)[Math.min(19, products.length - 1)]?.views || Infinity;
-const esc = (t) => t.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/"/g, "&quot;");
+// Values from the sheet can be numbers (e.g. an all-digit nota), so always convert to text first.
+const esc = (t) => String(t ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 
 // TikTok captions carry old prices, so the video catalog never shows them; current prices come from the admin app.
 const ASK_PRICE = '<p class="price price-ask"><sup>Rp</sup><b>Call / WhatsApp</b></p>';
