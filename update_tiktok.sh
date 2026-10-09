@@ -7,7 +7,11 @@
 set -euo pipefail
 cd "$(dirname "$0")"
 MODE="${1:-baru}"
-SRC="${SRC:-$HOME/premiumperabot}"
+# Downloads folder: ../tiktok next to this repo (iCloud layout: Documents/premiumperabot/{website,admin,tiktok}),
+# otherwise ~/premiumperabot. Override with SRC=/path ./update_tiktok.sh
+if [ -z "${SRC:-}" ]; then
+  if [ -d ../tiktok ]; then SRC="$(cd ../tiktok && pwd)"; else SRC="$HOME/premiumperabot"; fi
+fi
 ACCOUNT="https://www.tiktok.com/@premiumperabot"
 
 command -v yt-dlp >/dev/null || { echo "yt-dlp belum ada. Pasang dulu: brew install yt-dlp"; exit 1; }

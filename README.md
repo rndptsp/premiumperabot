@@ -7,6 +7,7 @@ Katalog produk diambil dari video TikTok [@premiumperabot](https://www.tiktok.co
 Ubah nomor WhatsApp, Instagram, dan lokasi Google Maps di bagian atas `app.js` (`CONFIG`).
 
 ## Perbarui katalog dari TikTok
+Folder video TikTok: `../tiktok` di sebelah folder ini (susunan iCloud `Documents/premiumperabot/`), selain itu `~/premiumperabot`.
 Di Mac, dari folder ini:
 - `./update_tiktok.sh` — cepat: hanya video **baru** di 40 postingan terakhir (video lama dilewati).
 - `./update_tiktok.sh semua` — lama: baca ulang semua video (sekalian memperbarui jumlah views).
