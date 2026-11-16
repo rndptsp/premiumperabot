@@ -14,6 +14,8 @@ Di Mac, dari folder ini:
 Hanya caption + gambar sampul yang diambil (tanpa file video), lalu commit & push otomatis.
 Pengaman: kalau jumlah produk turun lebih dari 10% (folder sumber tidak lengkap), website tidak diubah.
 Butuh `yt-dlp` (`brew install yt-dlp`).
+Tanpa folder unduhan lama (mis. di Mac lain): unduh postingan terbaru saja ke folder mana pun, lalu
+`python3 build_site.py --src FOLDER --merge && python3 build_pages.py` — postingan lama di website tetap ada.
 Editan di aplikasi (Katalog Web: judul, kategori, sembunyikan, unggulan) tetap berlaku.
 Catatan: hanya video yang captionnya menyebut harga (mis. "5 Jutaan") dianggap produk; video pengantaran masuk bagian Pengantaran.
 
