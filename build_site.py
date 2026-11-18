@@ -185,6 +185,9 @@ def main():
             products.append(item)
         elif re.search(DELIVERY, desc, re.I):
             deliveries.append(item)
+        elif category_of(title) != "lainnya":  # a product post without a price ("Kamarset Minimalis 3 pintu")
+            item.update(cat=category_of(title))
+            products.append(item)
 
     stats = {
         "posts": len(infos),
